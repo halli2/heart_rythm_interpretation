@@ -1,5 +1,7 @@
 # Emergency medical data analysis - heart-rythm-interpretation
 
+Continuation of [https://github.com/SanderSondeland/ELE690_project1](https://github.com/SanderSondeland/ELE690_project1)
+
 ## Filestructure
 
 * notebooks - contains notebooks for vizualisation of data.

@@ -36,9 +36,9 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/halli2/cardiac-rythm#readme"
-Issues = "https://github.com/halli2/cardiac-rythm/issues"
-Source = "https://github.com/halli2/cardiac-rythm"
+Documentation = "https://github.com/halli2/heart_rythm_interpretation#readme"
+Issues = "https://github.com/halli2/heart_rythm_interpretation/issues"
+Source = "https://github.com/halli2/heart_rythm_interpretation"
 
 [tool.hatch.version]
 path = "src/cardiac_rythm/__about__.py"
