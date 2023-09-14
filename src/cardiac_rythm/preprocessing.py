@@ -18,21 +18,6 @@ def load_data() -> pd.DataFrame:
     return df
 
 
-def discard_unused_params(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop(
-        [
-            "reg_name",
-            "t_int",
-            "o_label",
-            "s_imp",
-            "s_icc",
-            "nQRS",
-        ],
-        axis=1,
-    )
-    return df
-
-
 # TODO: Er dette nødvendig?? Er dette bare tap av data? TODO: TEST!
 def normalize_data_length(df: pd.DataFrame) -> pd.DataFrame:
     class_value_count = df["c_label"].value_counts().sort_index()

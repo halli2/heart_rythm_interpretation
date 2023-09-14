@@ -26,7 +26,6 @@ def fit() -> None:
     rng = np.random.RandomState(0)
     # Load data and create dataframe
     df = preprocessing.load_data()
-    df = preprocessing.discard_unused_params(df)
 
     if NORMALIZE_DATA_LENGTH:
         df = preprocessing.normalize_data_length(df)
