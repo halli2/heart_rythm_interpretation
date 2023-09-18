@@ -10,19 +10,31 @@ Continuation of [https://github.com/SanderSondeland/ELE690_project1](https://git
 
 ## How to run
 
-With hatch:
+### With hatch:
 
 ```sh
 hatch run fit
 ```
 
-Using pip and venv:
+### Using pip and venv:
 
 ```sh
 python3 -m venv .venv
 source .venv/bin/activate
 pip install .
 python src/cardiac_rythm
+```
+
+### On gorina11 internal server using slurm job:
+
+Setup:
+```sh
+sbatch tf_setup.sh
+```
+
+Run:
+```sh
+sbatch slurm_job.sh
 ```
 
 ## Results

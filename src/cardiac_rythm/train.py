@@ -13,11 +13,14 @@ NORMALIZE_DATA_LENGTH = False
 CLASS_WEIGHTS = True
 EPOCHS = 100
 BATCH_SIZE = 32
-FOLDS = 10
+FOLDS = 2
 MODEL = "CNN_5"  # CNN_PSP
+# PSP Settings
 PAD = True
 STRIDE = False
 POOL = 1
+# CNN_5 Settings
+INCREASING = True
 
 
 def fit() -> None:
@@ -68,9 +71,8 @@ def fit() -> None:
         if MODEL == "CNN_PSP":
             model = CNN_PSP(xt[0].shape, PAD, STRIDE, POOL)
         elif MODEL == "CNN_5":
-            model = CNN_5(xt[0].shape, True)
+            model = CNN_5(xt[0].shape, INCREASING)
 
-        model.summary()
         model.compile(
             optimizer="adam",
             loss="categorical_crossentropy",
@@ -95,6 +97,7 @@ def fit() -> None:
             class_weight=class_weights,
         )
 
+        # TODO: Save test acc etc, and with better names so easier to compare
         model.load_weights(saved_model)
         prediction = np.argmax(model.predict(x_test), axis=1)
         visualize.visualize_test_result(y_test, prediction, result_dir + f"confusion_{fold}.svg")

@@ -1,16 +1,15 @@
 from argparse import ArgumentParser
 
-from train import fit
-
 
 def main() -> None:
     parser = ArgumentParser()
-    parser.add_argument("-t", "--test")
+    parser.add_argument("file_path", help="Path to .mat file.")
     args = parser.parse_args()
-    if args.test:
-        pass
-    else:
-        fit()
+
+    # Loading tf is slow, so don't do it unless we have a file.
+    from train import fit
+
+    fit(args.path)
 
 
 if __name__ == "__main__":

@@ -3,14 +3,10 @@ import scipy
 from numpy.typing import NDArray
 
 
-def load_data() -> pd.DataFrame:
-    """Load the data."""
-    # Path to the directory where the data (mat-file) is located
-    path_cut_data = "/home/halli/ux/BMDLab/matlab/resprog/GUI/CleanCutsDL/"
-    file_cut_data = "cutDataCinCTTI_rev_v2.mat"  # Name of the mat-file, containing the data
-
+def load_data(data_file: str) -> pd.DataFrame:
+    """Load the data. Data_file is a .mat file (cutDataCinCTTI_rev_v2.mat)"""
     mat_cut_data: NDArray = scipy.io.loadmat(
-        path_cut_data + file_cut_data,
+        data_file,
         simplify_cells=True,
     )["data"]
 
