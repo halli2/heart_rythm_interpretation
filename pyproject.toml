@@ -7,7 +7,7 @@ name = "cardiac_rythm"
 dynamic = ["version"]
 description = 'Cardiac Rythm Interpretation'
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.10, <3.12"
 keywords = []
 authors = [
   { name = "Halvor Kvamme", email = "flkz@proton.me" },
@@ -24,15 +24,17 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "tensorflow>=2.12,<2.13",
-  "numpy>=1.22,<1.24",
-  "pandas~=2.1.0",
-  "matplotlib~=3.7.3",
-  "seaborn~=0.12.2",
-  "scikit-learn~=1.3.0",
-  "scipy~=1.11.2",
-  "ipykernel~=6.25.2",
-  "jupyter~=1.0.0",
+    "tensorflow>=2.12,<2.13",
+    "numpy>=1.22,<1.24",
+    "pandas~=2.1.0",
+    "matplotlib~=3.7.3",
+    "seaborn~=0.12.2",
+    "scikit-learn~=1.3.0",
+    "scipy~=1.11.2",
+    "ipykernel~=6.25.2",
+    "jupyter~=1.0.0",
+    "pydot>=1.4.2",
+    "dataclasses-json>=0.6.1",
 ]
 
 [project.urls]

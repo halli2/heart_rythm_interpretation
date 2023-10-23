@@ -7,9 +7,14 @@ def main() -> None:
     args = parser.parse_args()
 
     # Loading tf is slow, so don't do it unless we have a file.
-    from train import fit
+    from models import CNNConfig
+    from train import FitSettings, fit
 
-    fit(args.path)
+    settings = FitSettings(epochs=100, batch_size=32, folds=10, normalize_data_length=True)
+    model_config = CNNConfig(
+        layers=4, increasing=False, kernel_size=3, pool_each_conv=True, pool_after=False, padding="same"
+    )
+    fit(args.file_path, settings, model_config)
 
 
 if __name__ == "__main__":
