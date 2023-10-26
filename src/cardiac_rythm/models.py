@@ -16,14 +16,15 @@ class Pool(Enum):
 @dataclass_json
 @dataclass(frozen=True)
 class CNNConfig:
-    layers: int
-    increasing: bool
-    kernel_size: int | list[int]
+    filters: list[int]  # [32, 64, 128, 256, 256]
+    kernel_size: int | list[int]  # [3, 3, 1, 1, 1]
     stride: int = 1
     pool: tuple[int, int] = (3, 2)
     pool_each_conv: bool = False
     pool_after: bool = False
     padding: str = "same"  # Or valid
+    fc1: int = 512
+    fc2: int = 1024
 
 
 class ConvBlock(l.Layer):
@@ -39,9 +40,9 @@ class ConvBlock(l.Layer):
 
     def call(self, inputs):
         x = self.conv(inputs)
+        x = self.bn(x)
         if self.pool is not None:
             x = self.pool(x)
-        x = self.bn(x)
         return self.activation(x)
 
 
@@ -50,28 +51,29 @@ class CNN(keras.Model):
         super().__init__()
         self.config = config
 
-        filters = 32
         self.cnn_blocks = []
         enable_pooling = config.pool_each_conv
-        for i in range(config.layers):
-            if i + 1 == config.layers and config.pool_after:
+        for i, filt in enumerate(config.filters):
+            if i + 1 == len(config.filters) and config.pool_after:
                 enable_pooling = True
+            if config.kernel_size is int:
+                kernel_size = config.kernel_size
+            else:
+                kernel_size = config.kernel_size[i]
             self.cnn_blocks.append(
                 ConvBlock(
-                    filters,
-                    config.kernel_size,
+                    filt,
+                    kernel_size,
                     config.stride,
                     config.padding,
                     config.pool,
                     enable_pool=enable_pooling,
                 )
             )
-            if config.increasing:
-                filters *= 2
         self.dropout = l.Dropout(0.5)
         self.flatten = l.Flatten()
-        self.fc1 = l.Dense(512, activation="relu")
-        self.fc2 = l.Dense(1024, activation="relu")
+        self.fc1 = l.Dense(config.fc1, activation="relu")
+        self.fc2 = l.Dense(config.fc2, activation="relu")
         self.fc_out = l.Dense(5, activation="softmax")
 
     def call(self, x):
