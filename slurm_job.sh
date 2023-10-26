@@ -14,6 +14,7 @@ conda activate tf_env
 CONDA_PREFIX=$VIRTUAL_ENV
 CUDNN_PATH=$(dirname $(python -c "import nvidia.cudnn;print(nvidia.cudnn.__file__)"))
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/:$CUDNN_PATH/lib
+#pip install .
 
 # Run the Python script that uses the GPU
 python -u src/cardiac_rythm  "/home/prosjekt/BMDLab/matlab/resprog/GUI/CleanCutsDL/cutDataCinCTTI_rev_v2.mat"
