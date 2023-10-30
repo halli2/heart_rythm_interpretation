@@ -3,7 +3,6 @@ import pickle
 from dataclasses import dataclass
 from datetime import datetime
 
-import keras
 import numpy as np
 import pandas as pd
 import preprocessing
@@ -29,6 +28,7 @@ class FitSettings:
     batch_size: int = 32
     folds: int = 10
     normalize_data_length: bool = False  # Normalize, or weigh
+    cross_validate: bool = False  # If true run all folds
 
 
 def fit(file_path: str, fit_settings: FitSettings, model_config: CNNConfig) -> None:
@@ -129,4 +129,6 @@ def fit(file_path: str, fit_settings: FitSettings, model_config: CNNConfig) -> N
         prediction = np.argmax(model.predict(x_test), axis=1)
         visualize.visualize_test_result(y_test, prediction, result_dir + f"confusion_{fold}.svg")
         visualize.visualize_history(history.history, result_dir + f"history_{fold}.svg")
-        return
+        if not fit_settings.cross_validate:
+            # Early stopping for testing.
+            return

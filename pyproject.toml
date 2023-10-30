@@ -37,6 +37,11 @@ dependencies = [
     "dataclasses-json>=0.6.1",
 ]
 
+[tool.pdm.scripts]
+bandit_ = "bandit --r -ll src"
+mypy_ = "mypy src/"
+lint.composite = ["mypy_", "bandit_"]
+
 [project.urls]
 Documentation = "https://github.com/halli2/heart_rythm_interpretation#readme"
 Issues = "https://github.com/halli2/heart_rythm_interpretation/issues"
@@ -172,4 +177,10 @@ exclude_lines = [
 [tool.pytest.ini_options]
 pythonpath = [
   "src",
+]
+
+[tool.pdm.dev-dependencies]
+lint = [
+    "mypy>=1.6.1",
+    "bandit>=1.7.5",
 ]

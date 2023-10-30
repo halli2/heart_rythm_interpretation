@@ -5,7 +5,7 @@ from numpy.typing import NDArray
 from sklearn.metrics import accuracy_score, confusion_matrix
 
 
-def visualize_test_result(correct: NDArray[int], prediction: NDArray[int], filename: str) -> None:
+def visualize_test_result(correct: NDArray, prediction: NDArray, filename: str) -> None:
     """Plots a confusion matrix for the test result."""
     conf_matrix = confusion_matrix(correct, prediction)
     norm = conf_matrix.astype("float") / conf_matrix.sum(axis=1)[:, np.newaxis]
