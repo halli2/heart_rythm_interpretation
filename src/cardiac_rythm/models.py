@@ -15,6 +15,7 @@ class CNNConfig:
     pool: list[Optional[tuple[int, int]]]  # list of pools or none
     padding: str  # 'same' Or 'valid'
     fc_end: list[int]
+    dropout: float
 
 
 class ConvBlock(l.Layer):
@@ -30,7 +31,7 @@ class ConvBlock(l.Layer):
         self.conv = l.Conv1D(filters, kernel_size, stride, padding)
         self.bn = l.BatchNormalization()
         if pool:
-            self.pool = l.MaxPool1D(pool[0], pool[1])
+            self.pool = l.MaxPool1D(pool[0])  # , pool[1])
         else:
             self.pool = None
         self.activation = l.ReLU()
@@ -52,18 +53,20 @@ class CNN(keras.Model):
         settings = zip(config.filters, config.kernels, config.strides, config.pool)
         for filt, kernel, stride, pool in settings:
             self.cnn_blocks.append(ConvBlock(filt, kernel, stride, config.padding, pool))
-        self.dropout = l.Dropout(0.5)
-        self.flatten = l.Flatten()
+        self.dropout = l.Dropout(config.dropout)
+        # from Krasteva et al
+        self.gmp = l.GlobalMaxPool1D()
         self.fc_blocks = []
         for fc in config.fc_end:
             self.fc_blocks.append(l.Dense(fc, activation="relu"))
+
         self.fc_out = l.Dense(5, activation="softmax")
 
     def call(self, x):
         for block in self.cnn_blocks:
             x = block(x)
-        x = self.dropout(x)
-        x = self.flatten(x)
+            x = self.dropout(x)
+        x = self.gmp(x)
         for block in self.fc_blocks:
             x = block(x)
         x = self.fc_out(x)

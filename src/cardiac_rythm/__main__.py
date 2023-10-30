@@ -67,6 +67,13 @@ def main() -> None:
             If list, have to be same length as --filters. (default: 2)""",
         default=[2],
     )
+    parser.add_argument(
+        "--dropout-rate",
+        metavar="alpha",
+        type=float,
+        help="Dropout rate after eac convolution (default: 0.3)",
+        default=0.3,
+    )
 
     def pools(arg) -> list[int]:
         result = []
@@ -86,14 +93,7 @@ def main() -> None:
 
         \n
         output_shape = (input_shape - pool_size + 1) / strides) (default: 4, 3)""",
-        default=[[4, 3]],
-    )
-    parser.add_argument(
-        "--pool_after_conv",
-        type=int,
-        nargs="+",
-        help="0 = False, 1 = True. Int or list, if list has to be same length as filters (default: 0)",
-        default=[0],
+        default=[[2, 1]],
     )
     parser.add_argument(
         "--padding",
@@ -115,7 +115,6 @@ def main() -> None:
     filters = args.filters
     kernels = args.kernels
     strides = args.stride
-    pool_after_conv = args.pool_after_conv
 
     # Make sure kernels is a list of len(filters)
     def ensure_list_length(var_name: str, setting: int | list, filters: list) -> list:
@@ -129,8 +128,6 @@ def main() -> None:
     kernels = ensure_list_length("kernels", kernels, filters)
     strides = ensure_list_length("strides", strides, filters)
     pools = ensure_list_length("pools", pools, filters)
-    pool_after_conv = ensure_list_length("pool_after_conv", pool_after_conv, filters)
-    pool_after_conv = [bool(x) for x in pool_after_conv]
 
     # Loading tf is slow, so don't do it unless we have a file.
     from models import CNNConfig
@@ -143,20 +140,20 @@ def main() -> None:
         args.normalize_data_length,
         args.cross_validate,
     )
-    # PSP Model
-    # model_config  = CNNConfig()
-    # 5CNN Model
     model_config = CNNConfig(
-        filters,  # [32, 64, 128, 256, 512, 512],
+        filters,
         kernels,
         strides,
-        args.pool,
+        pools,
         args.padding,
         args.fc_end,
+        args.dropout_rate,
     )
 
     logging.info(f"{pp.pformat(settings)}")
     logging.info(f"{pp.pformat(model_config)}")
+
+    # logging.info(f"Saving to {settings.get_dir()}_{model_config.get_dir()}")
 
     fit(args.file_path, settings, model_config)
 

@@ -1,3 +1,4 @@
+import logging
 import os
 import pickle
 from dataclasses import dataclass
@@ -11,14 +12,6 @@ import visualize
 from dataclasses_json import dataclass_json
 from models import CNN, CNNConfig
 from sklearn import model_selection
-
-MODEL = "CNN_TODO"
-# # PSP Settings
-# PAD = True
-# STRIDE = False
-# POOL = 1
-# # CNN_5 Settings
-# INCREASING = True
 
 
 @dataclass_json
@@ -66,8 +59,10 @@ def fit(file_path: str, fit_settings: FitSettings, model_config: CNNConfig) -> N
     skf = model_selection.StratifiedKFold(n_splits=fit_settings.folds, random_state=rng, shuffle=True)
 
     time_now = datetime.now().strftime("%Y%m%d-%H%M%S")  # noqa: DTZ005
-    result_dir = f"logs/results/{time_now}_{MODEL}/"
-    log_dir = f"logs/fit/{time_now}_{MODEL}/"
+    result_dir = f"logs/results/{time_now}/"
+    log_dir = f"logs/fit/{time_now}/"
+
+    logging.info(f"Saving model to: {result_dir}")
 
     os.makedirs(log_dir)
     os.makedirs(result_dir)
@@ -77,27 +72,20 @@ def fit(file_path: str, fit_settings: FitSettings, model_config: CNNConfig) -> N
         f.write(fit_settings.to_json(indent=4))
     with open(f"{result_dir}model_config.json", "x") as f:
         f.write(model_config.to_json(indent=4))
+
     for fold, (train_index, val_index) in enumerate(skf.split(x_train, y_train)):
         xt = x_train[train_index]
         yt = pd.get_dummies(y_train[train_index])
         xv = x_train[val_index]
         yv = pd.get_dummies(y_train[val_index])
 
-        # model = None
-        # if MODEL == "CNN_PSP":
-        #     model = CNN_PSP(xt[0].shape, PAD, STRIDE, POOL)
-        #     # keras.utils.plot_model(model, "psp.png", show_shapes=True, expand_nested=True)
-        # elif MODEL == "CNN_5":
-        #     model = CNN_5(xt[0].shape, INCREASING)
+        opt = tf.keras.optimizers.Adam(
+            learning_rate=0.001,
+            # weight_decay=0.001 / fit_settings.epochs,
+        )
         model = CNN(model_config)
-        # model(xt[0:2])
-        # x = keras.Input(xt[0].shape)
-        # graph = keras.Model(inputs=x, outputs=model.call(x))
-        # graph.summary()
-        # keras.utils.plot_model(graph, "cnn.png", show_shapes=True, expand_nested=True)
-
         model.compile(
-            optimizer="adam",
+            opt,
             loss="categorical_crossentropy",
             metrics=["accuracy"],
         )
@@ -131,4 +119,4 @@ def fit(file_path: str, fit_settings: FitSettings, model_config: CNNConfig) -> N
         visualize.visualize_history(history.history, result_dir + f"history_{fold}.svg")
         if not fit_settings.cross_validate:
             # Early stopping for testing.
-            return
+            break
