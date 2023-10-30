@@ -24,13 +24,26 @@ def visualize_test_result(correct: NDArray, prediction: NDArray, filename: str) 
 
 
 def visualize_history(history: dict, filename: str) -> None:
-    """Plots everytning in a dictionary using plot(val, label=key)"""
-    n = len(history.keys())
-    cols = int(np.ceil(np.sqrt(n)))
-    f, ax = plt.subplots(cols, cols)
-    for i, (key, val) in enumerate(history.items()):
-        row = int(np.floor(i / cols))
-        col = i % cols
-        ax[row, col].plot(val, label=key)
-        ax[row, col].legend(loc="upper left")
+    fig, ax = plt.subplots(2, 1, figsize=(8, 16))
+    ax = ax.ravel()
+    ax[0].plot(history["accuracy"], label="accuracy")
+    ax[0].plot(history["val_accuracy"], label="val_accuracy")
+    ax[1].plot(history["loss"], label="loss")
+    ax[1].plot(history["val_loss"], label="val_loss")
+    for a in ax:
+        a.set_xlabel("Epoch")
+        a.legend(loc="upper left")
     plt.savefig(filename)
+
+
+# def visualize_history(history: dict, filename: str) -> None:
+#     """Plots everytning in a dictionary using plot(val, label=key)"""
+#     n = len(history.keys())
+#     cols = int(np.ceil(np.sqrt(n)))
+#     f, ax = plt.subplots(cols, cols)
+#     for i, (key, val) in enumerate(history.items()):
+#         row = int(np.floor(i / cols))
+#         col = i % cols
+#         ax[row, col].plot(val, label=key)
+#         ax[row, col].legend(loc="upper left")
+#     plt.savefig(filename)

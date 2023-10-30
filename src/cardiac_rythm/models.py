@@ -12,6 +12,7 @@ class CNNConfig:
     filters: list[int]
     kernels: list[int]
     strides: list[int]
+    # TODO: Intify
     pool: list[Optional[tuple[int, int]]]  # list of pools or none
     padding: str  # 'same' Or 'valid'
     fc_end: list[int]

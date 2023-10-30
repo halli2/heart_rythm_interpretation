@@ -1,9 +1,28 @@
 import logging
 import pprint as pp
+import sys
 from argparse import ArgumentParser
 
+import numpy as np
 
-def main() -> None:
+
+# def main() -> int:
+#     parser = ArgumentParser(description="Classify cardiac rythm.")
+#     parser.add_argument("file_path", help="Path to .mat file.")
+#     args = parser.parse_args()
+
+#     import tensorflow as tf
+
+#     from cardiac_rythm.hyper_tune import search_for_hyperparameters
+
+#     rng = np.random.RandomState(0)
+#     tf.random.set_seed(0)
+
+#     search_for_hyperparameters(args.file_path, rng)
+#     return 0
+
+
+def main() -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
     parser = ArgumentParser(description="Classify cardiac rythm.")
@@ -75,6 +94,7 @@ def main() -> None:
         default=0.3,
     )
 
+    # TODO: intify
     def pools(arg) -> list[int]:
         result = []
         for v in arg.split(";"):
@@ -157,6 +177,8 @@ def main() -> None:
 
     fit(args.file_path, settings, model_config)
 
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

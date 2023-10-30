@@ -28,25 +28,14 @@ def fit(file_path: str, fit_settings: FitSettings, model_config: CNNConfig) -> N
     """Loads the data, model and fits it."""
     # Set random seed for reproducibility
     rng = np.random.RandomState(0)
+    tf.random.set_seed(0)
     # Load data and create dataframe
     df = preprocessing.load_data(file_path)
-
-    if fit_settings.normalize_data_length:
-        df = preprocessing.normalize_data_length(df)
-
-    # TODO: Initialize to 0:1,1:1,2:1 etc..
-    class_weights = {}
-    total = len(df["c_label"])
-    class_counts = df["c_label"].value_counts().sort_index().values
-    for k, v in enumerate(class_counts):
-        class_weights[k] = 1 - (v / total)
 
     x = np.stack(df["s_ecg"].to_numpy())
     x = x.reshape((*x.shape, 1))
     y = df["c_label"].to_numpy()
     y = y - 1  # 0-4 instead of 1-5
-    # Should we stratify based on patients?
-    # groups = np.stack(df_data["patID"])
 
     x_train, x_test, y_train, y_test = model_selection.train_test_split(
         x,
@@ -55,6 +44,8 @@ def fit(file_path: str, fit_settings: FitSettings, model_config: CNNConfig) -> N
         random_state=rng,
         stratify=y,
     )
+
+    # x_train, y_train = preprocessing.replicate_data(x_train, y_train)
 
     skf = model_selection.StratifiedKFold(n_splits=fit_settings.folds, random_state=rng, shuffle=True)
 
@@ -75,7 +66,11 @@ def fit(file_path: str, fit_settings: FitSettings, model_config: CNNConfig) -> N
 
     for fold, (train_index, val_index) in enumerate(skf.split(x_train, y_train)):
         xt = x_train[train_index]
-        yt = pd.get_dummies(y_train[train_index])
+        yt = y_train[train_index]
+
+        xt, yt = preprocessing.replicate_data(xt, yt)
+
+        yt = pd.get_dummies(yt)
         xv = x_train[val_index]
         yv = pd.get_dummies(y_train[val_index])
 
@@ -105,7 +100,7 @@ def fit(file_path: str, fit_settings: FitSettings, model_config: CNNConfig) -> N
             batch_size=fit_settings.batch_size,
             epochs=fit_settings.epochs,
             callbacks=callbacks,
-            class_weight=class_weights,
+            # class_weight=class_weights,
         )
 
         # Dump training history
