@@ -13,7 +13,7 @@ class CNNConfig:
     kernels: list[int]
     strides: list[int]
     # TODO: Intify
-    pool: list[Optional[tuple[int, int]]]  # list of pools or none
+    pool: list[Optional[int]]  # list of pools or none
     padding: str  # 'same' Or 'valid'
     fc_end: list[int]
     dropout: float
@@ -26,13 +26,13 @@ class ConvBlock(l.Layer):
         kernel_size: int,
         stride: int,
         padding: str,
-        pool: tuple[int, int],
+        pool: Optional[int],
     ):
         super().__init__()
         self.conv = l.Conv1D(filters, kernel_size, stride, padding)
         self.bn = l.BatchNormalization()
         if pool:
-            self.pool = l.MaxPool1D(pool[0])  # , pool[1])
+            self.pool = l.MaxPool1D(pool)  # , pool[1])
         else:
             self.pool = None
         self.activation = l.ReLU()

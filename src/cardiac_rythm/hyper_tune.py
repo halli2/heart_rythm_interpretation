@@ -28,31 +28,56 @@ class CNNTuner(HyperModel):
         **kwargs: Arguments to inherited `HyperModel`
     """
 
-    def __init__(self, n_filters: int, **kwargs):
+    def __init__(
+        self,
+        n_filters: int,
+        filter_choice: list[int],
+        kernel_choice: list[int],
+        dropout_choice: tuple[float, float],
+        pool_choice: list[int],
+        stride: int,
+        n_fc: int,
+        fc_choice: list[int],
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self.n_filters = n_filters
-        self.filter_choice = [5, 10, 15, 20]
-        self.kernel_choice = [5, 10, 15, 20]
+        self.filter_choice = filter_choice  # [5, 10, 15, 20, 25, 30, 40, 50]
+        self.kernel_choice = kernel_choice  # [5, 10, 15, 20, 25, 30, 40, 50]
+        self.dropout_choice = dropout_choice
+        self.pool_choice = pool_choice
+        self.stride = stride
+        self.n_fc = n_fc
+        self.fc_choice = fc_choice
 
     def build(self, hp: HyperParameters) -> CNN:
         filters = []
         kernels = []
         strides = []
         pool = []
+        pool_choice = hp.Choice("pool", self.pool_choice)
         for i in range(self.n_filters):
             filters.append(hp.Choice(f"filters{i}", self.filter_choice))
             kernels.append(hp.Choice(f"kernels{i}", self.kernel_choice))
-            strides.append(1)
-            pool.append([2, 2])
+            strides.append(self.stride)
+            pool.append(pool_choice)
 
+        fc_blocks = []
+        for i in range(self.n_fc):
+            fc_blocks.append(hp.Choice(f"fc{i}", self.fc_choice))
         model_config = CNNConfig(
             filters,
             kernels,
             strides,
             pool,
             "valid",
-            fc_end=[64, 128],
-            dropout=hp.Float("dropout", 0.1, 0.9, step=0.1),
+            fc_end=fc_blocks,
+            dropout=hp.Float(
+                "dropout",
+                self.dropout_choice[0],
+                self.dropout_choice[1],
+                step=0.1,
+            ),
         )
 
         model = CNN(model_config)
@@ -179,8 +204,8 @@ class RandomSearchOptimization(RandomSearch):
         return histories
 
 
-def search_for_hyperparameters(file_path: str, rng: np.random.RandomState) -> None:
-    df = load_data(file_path)
+def search_for_hyperparameters(args, rng: np.random.RandomState) -> None:
+    df = load_data(args.file_path)
 
     x = np.stack(df["s_ecg"].to_numpy())
     x = x.reshape((*x.shape, 1))
@@ -194,18 +219,56 @@ def search_for_hyperparameters(file_path: str, rng: np.random.RandomState) -> No
         random_state=rng,
         stratify=y,
     )
-    n_filters = 2
+    n_filters = args.n_filters
+    n_fc = args.n_fc
+    project_name = f"{n_filters=}_{n_fc=}"
     callbacks = [
         keras.callbacks.EarlyStopping(
             monitor="val_loss",
             mode="min",
             verbose=1,
-            patience=50,
+            patience=30,
         ),
         keras.callbacks.TensorBoard(
-            log_dir=f"results/{n_filters}/tb",
+            log_dir=f"results/{project_name}/tb",
         ),
     ]
+
+    tuner = RandomSearchOptimization(
+        rng,
+        n_folds=args.n_folds,  # TODO: 10 10 10
+        hypermodel=CNNTuner(
+            args.n_filters,
+            args.filters,
+            args.kernels,
+            args.dropout,
+            args.pool,
+            args.stride,
+            args.n_fc,
+            args.fc_choice,
+        ),
+        objective="val_loss",
+        max_trials=args.max_trials,
+        directory="results",
+        project_name=project_name,
+        overwrite=False,
+    )
+    tuner.search(
+        x_train,
+        y_train,
+        x_test,
+        y_test,
+        batch_size=32,
+        epochs=250,
+        callbacks=callbacks,
+    )
+    # TODO: Check the best results etc..
+    with open(f"results/{n_filters=}/tuner.pickle", "wb") as f:
+        pickle.dump(tuner, f)
+
+
+def check_best(rng):
+    n_filters = 2
 
     tuner = RandomSearchOptimization(
         rng,
@@ -215,26 +278,30 @@ def search_for_hyperparameters(file_path: str, rng: np.random.RandomState) -> No
         max_trials=2,
         directory="results",
         project_name=f"{n_filters=}",
-        overwrite=True,  # TODO: FALSE FALSE FALSE! (don't want to lose data after many trials..)
+        overwrite=False,  # TODO: FALSE FALSE FALSE! (don't want to lose data after many trials..)
     )
-    tuner.search(
-        x_train,
-        y_train,
-        x_test,
-        y_test,
-        batch_size=32,
-        epochs=50,
-        callbacks=callbacks,
-    )
-    # TODO: Check the best results etc..
-    with open(f"results/{n_filters=}/tuner.pickle", "wb") as f:
-        pickle.dump(tuner, f)
+    # tuner.search_space_summary()
+    print(tuner.get_best_models()[0].config)
+    print(tuner.get_best_hyperparameters()[0].values)
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     parser = ArgumentParser(description="Search for hyperparameters.")
     parser.add_argument("file_path", help="Path to .mat file.")
+    # Tuner settings
+    parser.add_argument("--max_trials", type=int, default=5)
+    parser.add_argument("--n_folds", type=int, default=10)
+
+    # Model settings
+    parser.add_argument("--n_filters", type=int, default=2)
+    parser.add_argument("--filters", type=int, nargs="+", default=[5, 10, 15, 20])
+    parser.add_argument("--kernels", type=int, nargs="+", default=[5, 10, 15, 20])
+    parser.add_argument("--dropout", type=float, nargs="+", default=[0.1, 0.9])
+    parser.add_argument("--pool", type=int, nargs="+", default=[2])
+    parser.add_argument("--stride", type=int, default=1)
+    parser.add_argument("--n_fc", type=int, default=2)
+    parser.add_argument("--fc_choice", type=int, nargs="+", default=[32, 64, 128])
     args = parser.parse_args()
 
     import tensorflow as tf
@@ -242,4 +309,5 @@ if __name__ == "__main__":
     rng = np.random.RandomState(0)
     tf.random.set_seed(0)
 
-    search_for_hyperparameters(args.file_path, rng)
+    # check_best(rng)
+    search_for_hyperparameters(args, rng)
