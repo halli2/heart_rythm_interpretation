@@ -24,7 +24,14 @@ class CNNTuner(HyperModel):
     """This class configures the tuneable hyperparameters we care about.
 
     Args:
-        n_filters: int, the number of filters we want to test
+        n_filters: the number of filters we want to test
+        filter_choice: possible choice of filters to use in the search
+        kernel_choice: possible choice of kernel sizes to use in the search
+        dropout_choice: tuple of lower dropout choice and highest dropout choice (step=0.1)
+        pool_choice: possible choices for pool sizes
+        stride: stride used in convolution
+        n_fc: number of fully connected hidden layers
+        fc_choice: possible choices of nodes in the fully connected hidden layers
         **kwargs: Arguments to inherited `HyperModel`
     """
 
@@ -93,13 +100,13 @@ class CNNTuner(HyperModel):
         return model
 
 
-class RandomSearchOptimization(RandomSearch):
+class RandomSearchCrossValidate(RandomSearch):
     """Override RandomSearch so we can run cross validation + saving some extra stuff
     like plots and history dicts
 
     Args:
-        rng: RandomState, numpy RandomState
-        n_folds: int, number of folds in the cross validation
+        rng: numpy RandomState used in `StratifiedKFold`
+        n_folds: number of folds in the cross validation
         **kwargs: arguments relevant to `RandomSearch` and relevant `Tuners` under `RandomSearch`
     """
 
@@ -234,7 +241,7 @@ def search_for_hyperparameters(args, rng: np.random.RandomState) -> None:
         ),
     ]
 
-    tuner = RandomSearchOptimization(
+    tuner = RandomSearchCrossValidate(
         rng,
         n_folds=args.n_folds,
         hypermodel=CNNTuner(
@@ -270,7 +277,7 @@ def search_for_hyperparameters(args, rng: np.random.RandomState) -> None:
 def check_best(rng):
     n_filters = 2
 
-    tuner = RandomSearchOptimization(
+    tuner = RandomSearchCrossValidate(
         rng,
         n_folds=2,  # TODO: 10 10 10
         hypermodel=CNNTuner(n_filters=n_filters),

@@ -3,9 +3,6 @@ import pprint as pp
 import sys
 from argparse import ArgumentParser
 
-import numpy as np
-
-
 # def main() -> int:
 #     parser = ArgumentParser(description="Classify cardiac rythm.")
 #     parser.add_argument("file_path", help="Path to .mat file.")
