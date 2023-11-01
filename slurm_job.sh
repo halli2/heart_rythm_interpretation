@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --gres=gpu:1
 #SBATCH --partition=gpuA100 
-#SBATCH --time=02:00:00
-#SBATCH --job-name=cardiac_fit
+#SBATCH --time=24:00:00
+#SBATCH --job-name=cardiac_hyper_fit
 #SBATCH --output=slurm_job.out
  
 # Activate environment
@@ -20,7 +20,7 @@ conda activate tf_env
 # python -u src/cardiac_rythm  "/home/prosjekt/BMDLab/matlab/resprog/GUI/CleanCutsDL/cutDataCinCTTI_rev_v2.mat"
 python -u src/cardiac_rythm/hyper_tune.py \
 "/home/prosjekt/BMDLab/matlab/resprog/GUI/CleanCutsDL/cutDataCinCTTI_rev_v2.mat"  \
---max_trials 100 \
+--max_trials 250 \
 --n_folds 10 \
 --n_filters 2 \
 --filters 5 10 15 20 25 30 40 50 \

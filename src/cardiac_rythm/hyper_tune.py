@@ -42,8 +42,8 @@ class CNNTuner(HyperModel):
     ):
         super().__init__(**kwargs)
         self.n_filters = n_filters
-        self.filter_choice = filter_choice  # [5, 10, 15, 20, 25, 30, 40, 50]
-        self.kernel_choice = kernel_choice  # [5, 10, 15, 20, 25, 30, 40, 50]
+        self.filter_choice = filter_choice
+        self.kernel_choice = kernel_choice
         self.dropout_choice = dropout_choice
         self.pool_choice = pool_choice
         self.stride = stride
@@ -156,8 +156,8 @@ class RandomSearchOptimization(RandomSearch):
                 hp = trial.hyperparameters
                 model: CNN = self._try_build(hp)
 
-                # Dump the model config in a better format
-                if fold == 0:
+                # Dump the model config in a better format (if it is valid)
+                if fold == 1:
                     logging.info(f"Training: {pp.pformat(model.config)}")
                     with open(f"{trial_dir}/model_config.json", "x") as f:
                         f.write(model.config.to_json(indent=2))
@@ -236,7 +236,7 @@ def search_for_hyperparameters(args, rng: np.random.RandomState) -> None:
 
     tuner = RandomSearchOptimization(
         rng,
-        n_folds=args.n_folds,  # TODO: 10 10 10
+        n_folds=args.n_folds,
         hypermodel=CNNTuner(
             args.n_filters,
             args.filters,
