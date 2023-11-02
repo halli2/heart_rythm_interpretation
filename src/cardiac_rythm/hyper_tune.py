@@ -46,7 +46,7 @@ class CNNTuner(HyperModel):
         n_fc: int,
         fc_choice: list[int],
         **kwargs,
-    ):
+    ) -> None:
         super().__init__(**kwargs)
         self.n_filters = n_filters
         self.filter_choice = filter_choice
@@ -115,11 +115,11 @@ class RandomSearchCrossValidate(RandomSearch):
         rng: np.random.RandomState,
         n_folds: int = 10,
         **kwargs,
-    ):
+    ) -> None:
         super().__init__(**kwargs)
         self.skf = StratifiedKFold(n_splits=n_folds, random_state=rng, shuffle=True)
 
-    def run_trial(self, trial, *args, **kwargs):
+    def run_trial(self, trial, *args, **kwargs) -> list[dict]:
         """Override `run_trial` to implement cross validation."""
         x_train, y_train, x_test, y_test, *remaining_args = args
 
@@ -136,85 +136,108 @@ class RandomSearchCrossValidate(RandomSearch):
         original_callbacks = kwargs.pop("callbacks", [])
 
         histories = []
-        for execution in range(self.executions_per_trial):
-            total_acc = 0.0
-            total_val_acc = 0.0
-            total_loss = 0.0
-            total_val_loss = 0.0
-            for fold, (train_index, val_index) in enumerate(self.skf.split(x_train, y_train)):
-                xt, xv = x_train[train_index], x_train[val_index]
-                yt, yv = y_train[train_index], y_train[val_index]
-                yt = pd.get_dummies(yt)
-                yv = pd.get_dummies(yv)
-                copied_kwargs = copy.copy(kwargs)
-                callbacks = self._deepcopy_callbacks(original_callbacks)
+        # Always 1 execution
+        total_acc = 0.0
+        total_val_acc = 0.0
+        total_loss = 0.0
+        total_val_loss = 0.0
+        for fold, (train_index, val_index) in enumerate(self.skf.split(x_train, y_train)):
+            xt, xv = x_train[train_index], x_train[val_index]
+            yt, yv = y_train[train_index], y_train[val_index]
+            yt = pd.get_dummies(yt)
+            yv = pd.get_dummies(yv)
+            copied_kwargs = copy.copy(kwargs)
+            callbacks = self._deepcopy_callbacks(original_callbacks)
 
-                # Add fold to tensorboard callback
-                for callback in callbacks:
-                    if isinstance(callback, keras.callbacks.TensorBoard):
-                        callback.log_dir += f"/fold_{fold}"
+            # Set TB dir to use current fold as execution_nn
+            self._configure_tensorboard_dir(callbacks, trial, fold)
+            callbacks.append(tuner_utils.TunerCallback(self, trial))
+            # Only checkpoint the best epoch across all executions.
+            callbacks.append(model_checkpoint)
+            copied_kwargs["callbacks"] = callbacks
 
-                self._configure_tensorboard_dir(callbacks, trial, execution)
-                callbacks.append(tuner_utils.TunerCallback(self, trial))
-                # Only checkpoint the best epoch across all executions.
-                callbacks.append(model_checkpoint)
-                copied_kwargs["callbacks"] = callbacks
+            hp = trial.hyperparameters
+            model: CNN = self._try_build(hp)
 
-                hp = trial.hyperparameters
-                model: CNN = self._try_build(hp)
-
-                # Dump the model config in a better format (if it is valid)
-                if fold == 1:
-                    logging.info(f"Training: {pp.pformat(model.config)}")
-                    with open(f"{trial_dir}/model_config.json", "x") as f:
-                        f.write(model.config.to_json(indent=2))
-                history = self.hypermodel.fit(
-                    hp,
-                    model,
-                    xt,
-                    yt,
-                    validation_data=(xv, yv),
-                    *remaining_args,  # noqa: B026
-                    **copied_kwargs,
-                )
-
-                # Test the model and save conf mat, accuracy and loss
-                # TODO: Or just do it on the BEST model?
-                visualize_history(history.history, f"{trial_dir}/{fold}.svg")
-                # Dump history in case we want to plot it.
-                with open(f"{trial_dir}/history_dict_{fold}", "wb") as f:
-                    pickle.dump(history.history, f)
-
-                total_loss += min(history.history["loss"])
-                total_val_loss += min(history.history["val_loss"])
-                total_acc += max(history.history["accuracy"])
-                total_val_acc += max(history.history["val_accuracy"])
-
-            # Store average loss/accuracy
-            avg_loss = total_loss / self.skf.get_n_splits()
-            avg_val_loss = total_val_loss / self.skf.get_n_splits()
-            avg_accuracy = total_acc / self.skf.get_n_splits()
-            avg_val_accuracy = total_val_acc / self.skf.get_n_splits()
-
-            histories.append(
-                {
-                    "loss": avg_loss,
-                    "val_loss": avg_val_loss,
-                    "accuracy": avg_accuracy,
-                    "val_accuracy": avg_val_accuracy,
-                }
+            # Dump the model config in a better format (if it is valid)
+            if fold == 1:
+                logging.info(f"Training: {pp.pformat(model.config)}")
+                with open(f"{trial_dir}/model_config.json", "x") as f:
+                    f.write(model.config.to_json(indent=2))  # type: ignore
+            history = self.hypermodel.fit(
+                hp,
+                model,
+                xt,
+                yt,
+                validation_data=(xv, yv),
+                *remaining_args,  # noqa: B026
+                **copied_kwargs,
             )
-            model.load_weights(saved_model)
-            prediction = np.argmax(model.predict(x_test), axis=1)
-            visualize_test_result(y_test, prediction, f"{trial_dir}/conf_mat.svg")
+
+            # Test the model and save conf mat, accuracy and loss
+            # TODO: Or just do it on the BEST model?
+            visualize_history(history.history, f"{trial_dir}/{fold}.svg")
+            # Dump history in case we want to plot it.
+            with open(f"{trial_dir}/history_dict_{fold}", "wb") as f:
+                pickle.dump(history.history, f)
+
+            total_loss += min(history.history["loss"])
+            total_val_loss += min(history.history["val_loss"])
+            total_acc += max(history.history["accuracy"])
+            total_val_acc += max(history.history["val_accuracy"])
+
+        # Store average loss/accuracy
+        avg_loss = total_loss / self.skf.get_n_splits()
+        avg_val_loss = total_val_loss / self.skf.get_n_splits()
+        avg_accuracy = total_acc / self.skf.get_n_splits()
+        avg_val_accuracy = total_val_acc / self.skf.get_n_splits()
+
+        histories.append(
+            {
+                "loss": avg_loss,
+                "val_loss": avg_val_loss,
+                "accuracy": avg_accuracy,
+                "val_accuracy": avg_val_accuracy,
+            }
+        )
+        model.load_weights(saved_model)
+        prediction = np.argmax(model.predict(x_test), axis=1)
+        visualize_test_result(y_test, prediction, f"{trial_dir}/conf_mat.svg")
 
         return histories
+
+
+# As running a lot of tests will produce a lot of output (hundreds of megabytes)
+# We create a callback to only get some outputs
+class ProgressionLogger(keras.callbacks.Callback):
+    """
+    Keras callback to log on the n'th epoch. Useful when logging multiple runs to a file, as the default `ProgbarLogger`
+    will spit out enormous amount of info
+
+    args:
+        show: show stats on n'th epoch
+    """
+
+    def __init__(self, show: int = 10):
+        super().__init__()
+        self.counter = 0
+        self.show = show
+
+    def on_epoch_end(self, epoch: int, logs=None) -> None:
+        if self.counter == self.show or epoch == 1:
+            if epoch > 1:
+                self.counter = 0
+            logging.info(
+                f"Epoch: {self.epoch} - Loss: {logs['loss']} - ValLoss: {logs['val_loss']} - "
+                f"Accuracy: {logs['accuracy']} - ValAccuracy: {logs['val_accuracy']}"
+            )
+        self.counter += 1
 
 
 def search_for_hyperparameters(args, rng: np.random.RandomState) -> None:
     df = load_data(args.file_path)
 
-    x = np.stack(df["s_ecg"].to_numpy())
+    x = np.stack(df["s_ecg"].to_numpy())  # type: ignore
     x = x.reshape((*x.shape, 1))
     y = df["c_label"].to_numpy()
     y = y - 1  # 0-4 instead of 1-5
@@ -239,6 +262,7 @@ def search_for_hyperparameters(args, rng: np.random.RandomState) -> None:
         keras.callbacks.TensorBoard(
             log_dir=f"results/{project_name}/tb",
         ),
+        ProgressionLogger(),
     ]
 
     tuner = RandomSearchCrossValidate(
@@ -268,28 +292,26 @@ def search_for_hyperparameters(args, rng: np.random.RandomState) -> None:
         batch_size=32,
         epochs=250,
         callbacks=callbacks,
+        verbose=0,
     )
-    # TODO: Check the best results etc..
-    with open(f"results/{n_filters=}/tuner.pickle", "wb") as f:
-        pickle.dump(tuner, f)
 
 
-def check_best(rng):
-    n_filters = 2
+# def check_best(rng):
+#     n_filters = 2
 
-    tuner = RandomSearchCrossValidate(
-        rng,
-        n_folds=2,  # TODO: 10 10 10
-        hypermodel=CNNTuner(n_filters=n_filters),
-        objective="val_loss",
-        max_trials=2,
-        directory="results",
-        project_name=f"{n_filters=}",
-        overwrite=False,  # TODO: FALSE FALSE FALSE! (don't want to lose data after many trials..)
-    )
-    # tuner.search_space_summary()
-    print(tuner.get_best_models()[0].config)
-    print(tuner.get_best_hyperparameters()[0].values)
+#     tuner = RandomSearchCrossValidate(
+#         rng,
+#         n_folds=2,  # TODO: 10 10 10
+#         hypermodel=CNNTuner(n_filters=n_filters),
+#         objective="val_loss",
+#         max_trials=2,
+#         directory="results",
+#         project_name=f"{n_filters=}",
+#         overwrite=False,  # TODO: FALSE FALSE FALSE! (don't want to lose data after many trials..)
+#     )
+#     # tuner.search_space_summary()
+#     print(tuner.get_best_models()[0].config)
+#     print(tuner.get_best_hyperparameters()[0].values)
 
 
 if __name__ == "__main__":
@@ -311,10 +333,10 @@ if __name__ == "__main__":
     parser.add_argument("--fc_choice", type=int, nargs="+", default=[32, 64, 128])
     args = parser.parse_args()
 
-    import tensorflow as tf
+    # import tensorflow as tf
 
     rng = np.random.RandomState(0)
-    tf.random.set_seed(0)
+    # tf.random.set_seed(0)
 
     # check_best(rng)
     search_for_hyperparameters(args, rng)

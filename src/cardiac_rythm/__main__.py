@@ -2,21 +2,7 @@ import logging
 import pprint as pp
 import sys
 from argparse import ArgumentParser
-
-# def main() -> int:
-#     parser = ArgumentParser(description="Classify cardiac rythm.")
-#     parser.add_argument("file_path", help="Path to .mat file.")
-#     args = parser.parse_args()
-
-#     import tensorflow as tf
-
-#     from cardiac_rythm.hyper_tune import search_for_hyperparameters
-
-#     rng = np.random.RandomState(0)
-#     tf.random.set_seed(0)
-
-#     search_for_hyperparameters(args.file_path, rng)
-#     return 0
+from typing import Optional
 
 
 def main() -> int:
@@ -91,26 +77,15 @@ def main() -> int:
         default=0.3,
     )
 
-    # TODO: intify
-    def pools(arg) -> list[int]:
-        result = []
-        for v in arg.split(";"):
-            inner = [int(y) for y in v.split(",")]
-            if inner[0] == 0:
-                inner = None
-            result.append(inner)
-        return result
-
     parser.add_argument(
         "--pool",
-        type=pools,
+        type=int,
+        nargs="+",
         help="""
-        List of pool (pool_size, stride) or 0 (pooling disabled).
-        Format: "3,2;3,2;0" gives: [(3, 2), (3, 2), 0]
-
+        List of `pool_size` or 0 (pooling disabled).
         \n
-        output_shape = (input_shape - pool_size + 1) / strides) (default: 4, 3)""",
-        default=[[2, 1]],
+        output_shape = (input_shape - pool_size + 1) / pool_size) (default: 2)""",
+        default=[2],
     )
     parser.add_argument(
         "--padding",
@@ -134,7 +109,7 @@ def main() -> int:
     strides = args.stride
 
     # Make sure kernels is a list of len(filters)
-    def ensure_list_length(var_name: str, setting: int | list, filters: list) -> list:
+    def ensure_list_length(var_name: str, setting: list, filters: list) -> list:
         if len(setting) == 1:
             setting = setting * len(filters)
         elif not len(setting) == len(filters):
@@ -145,10 +120,13 @@ def main() -> int:
     kernels = ensure_list_length("kernels", kernels, filters)
     strides = ensure_list_length("strides", strides, filters)
     pools = ensure_list_length("pools", pools, filters)
+    for i, p in enumerate(pools):
+        if p == 0:
+            pools[i] = None
 
     # Loading tf is slow, so don't do it unless we have a file.
-    from models import CNNConfig
-    from train import FitSettings, fit
+    from cardiac_rythm.models import CNNConfig
+    from cardiac_rythm.train import FitSettings, fit
 
     settings = FitSettings(
         args.epochs,

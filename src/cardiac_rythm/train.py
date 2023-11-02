@@ -60,7 +60,7 @@ def fit(file_path: str, fit_settings: FitSettings, model_config: CNNConfig) -> N
 
     # Dump used settings
     with open(f"{result_dir}settings.json", "x") as f:
-        f.write(fit_settings.to_json(indent=4))
+        f.write(fit_settings.to_json(indent=4))  # type: ignore
     with open(f"{result_dir}model_config.json", "x") as f:
         f.write(model_config.to_json(indent=4))
 

@@ -43,58 +43,18 @@ bandit_ = "bandit --r -ll src"
 mypy_ = "mypy src/"
 lint.composite = ["mypy_", "bandit_"]
 
+[tool.pdm.dev-dependencies]
+lint = [
+    "mypy>=1.6.1",
+    "bandit>=1.7.5",
+]
+dev = [
+    "pandas-stubs>=2.0.1.230501",
+]
 [project.urls]
 Documentation = "https://github.com/halli2/heart_rythm_interpretation#readme"
 Issues = "https://github.com/halli2/heart_rythm_interpretation/issues"
 Source = "https://github.com/halli2/heart_rythm_interpretation"
-
-[tool.hatch.version]
-path = "src/cardiac_rythm/__about__.py"
-
-[tool.hatch.envs.default]
-dependencies = [
-  "coverage[toml]>=6.5",
-  "pytest",
-]
-[tool.hatch.envs.default.scripts]
-fit = "python src/cardiac_rythm"
-
-test = "pytest {args:tests}"
-test-cov = "coverage run -m pytest {args:tests}"
-cov-report = [
-  "- coverage combine",
-  "coverage report",
-]
-cov = [
-  "test-cov",
-  "cov-report",
-]
-
-[[tool.hatch.envs.all.matrix]]
-python = ["3.7", "3.8", "3.9", "3.10", "3.11"]
-
-[tool.hatch.envs.lint]
-detached = true
-dependencies = [
-  "black>=23.1.0",
-  "mypy>=1.0.0",
-  "ruff>=0.0.243",
-]
-[tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive {args:src/cardiac_rythm tests}"
-style = [
-  "ruff {args:.}",
-  "black --check --diff {args:.}",
-]
-fmt = [
-  "black {args:.}",
-  "ruff --fix {args:.}",
-  "style",
-]
-all = [
-  "style",
-  "typing",
-]
 
 [tool.black]
 target-version = ["py37"]
@@ -156,32 +116,11 @@ ban-relative-imports = "all"
 # Tests can use magic values, assertions, and relative imports
 "tests/**/*" = ["PLR2004", "S101", "TID252"]
 
-[tool.coverage.run]
-source_pkgs = ["cardiac_rythm", "tests"]
-branch = true
-parallel = true
-omit = [
-  "src/cardiac_rythm/__about__.py",
-]
-
-[tool.coverage.paths]
-cardiac_rythm = ["src/cardiac_rythm", "*/cardiac_rythm/src/cardiac_rythm"]
-tests = ["tests", "*/cardiac_rythm/tests"]
-
-[tool.coverage.report]
-exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-]
-
-[tool.pytest.ini_options]
-pythonpath = [
-  "src",
-]
-
-[tool.pdm.dev-dependencies]
-lint = [
-    "mypy>=1.6.1",
-    "bandit>=1.7.5",
-]
+[tool.mypy]
+check_untyped_defs = true
+ignore_missing_imports = true
+show_error_codes = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unused_ignores = true
+files = "src"

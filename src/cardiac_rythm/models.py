@@ -54,7 +54,7 @@ class ConvBlock(l.Layer):
         stride: int,
         padding: str,
         pool: Optional[int],
-    ):
+    ) -> None:
         super().__init__()
         self.conv = l.Conv1D(filters, kernel_size, stride, padding)
         self.bn = l.BatchNormalization()
@@ -84,7 +84,7 @@ class CNN(keras.Model):
         config: `CNNConfig`, a dataclass containing all configuration options for the model.
     """
 
-    def __init__(self, config: CNNConfig):
+    def __init__(self, config: CNNConfig) -> None:
         super().__init__()
         self.config = config
 
