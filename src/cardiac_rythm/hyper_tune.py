@@ -228,7 +228,7 @@ class ProgressionLogger(keras.callbacks.Callback):
             if epoch > 1:
                 self.counter = 0
             logging.info(
-                f"Epoch: {self.epoch} - Loss: {logs['loss']} - ValLoss: {logs['val_loss']} - "
+                f"Epoch: {epoch} - Loss: {logs['loss']} - ValLoss: {logs['val_loss']} - "
                 f"Accuracy: {logs['accuracy']} - ValAccuracy: {logs['val_accuracy']}"
             )
         self.counter += 1
