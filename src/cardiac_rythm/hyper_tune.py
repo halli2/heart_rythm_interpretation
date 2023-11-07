@@ -271,7 +271,8 @@ def search_for_hyperparameters(args, rng: np.random.RandomState) -> None:
     if args.override:
         hp.Fixed("fc0", value=64)
         hp.Fixed("fc1", value=32)
-        hp.Fixed("dropout", value=0.30000000000000004)
+        hp.Fixed("dropout", value=0.3)
+        project_name = f"{project_name}_overriden"
     tuner = RandomSearchCrossValidate(
         rng,
         n_folds=args.n_folds,
