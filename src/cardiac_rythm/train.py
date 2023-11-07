@@ -6,11 +6,10 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
-import preprocessing
 import tensorflow as tf
-import visualize
+from cardiac_rythm import visualize, preprocessing
+from cardiac_rythm.models import CNN, CNNConfig
 from dataclasses_json import dataclass_json
-from models import CNN, CNNConfig
 from sklearn import model_selection
 
 
@@ -62,7 +61,7 @@ def fit(file_path: str, fit_settings: FitSettings, model_config: CNNConfig) -> N
     with open(f"{result_dir}settings.json", "x") as f:
         f.write(fit_settings.to_json(indent=4))  # type: ignore
     with open(f"{result_dir}model_config.json", "x") as f:
-        f.write(model_config.to_json(indent=4))
+        f.write(model_config.to_json(indent=4))  # type: ignore
 
     for fold, (train_index, val_index) in enumerate(skf.split(x_train, y_train)):
         xt = x_train[train_index]

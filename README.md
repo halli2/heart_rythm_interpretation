@@ -4,16 +4,18 @@ Continuation of [https://github.com/SanderSondeland/ELE690_project1](https://git
 
 ## Filestructure
 
-* notebooks - contains notebooks for vizualisation of data.
-* cardiac_rythm - contains the code for the models.
+* src/notebooks - contains notebooks for vizualisation of data.
+* src/cardiac_rythm - contains the code for the models.
+* results - contains the results for the hyper parameter search
 * logs - containing logs and results form the model fitting.
 
 ## How to run
 
-### With hatch:
+### With pdm:
 
 ```sh
-hatch run fit
+pdm install
+pdm run main
 ```
 
 ### Using pip and venv:
@@ -34,10 +36,16 @@ sbatch tf_setup.sh
 
 Run:
 ```sh
-sbatch slurm_job.sh
+sbatch slurm_man_fit.sh
+sbatch slurm_job_hyper.sh
 ```
+
+Where `slurm_man_fit.sh` contains an example of how to run a specific model and `slurm_job_hyper.sh`
+contains an example of how to run random search given some parameters.
 
 ## Results
 
 Results are stored in the logs folder. Confusion matrix, and history plots are stored in logs/results/{timestamp}_{modelname}.
 To vizualise more data with tensorboard run `tensorboard --logdir logs/fit/{timestamp}_{modelname}` while in venv or poetry shell.
+
+

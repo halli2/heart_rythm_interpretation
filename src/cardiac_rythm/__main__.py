@@ -2,11 +2,12 @@ import logging
 import pprint as pp
 import sys
 from argparse import ArgumentParser
-from typing import Optional
 
 
 def main() -> int:
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
 
     parser = ArgumentParser(description="Classify cardiac rythm.")
     parser.add_argument("file_path", help="Path to .mat file.")

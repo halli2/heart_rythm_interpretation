@@ -53,6 +53,8 @@ def normalize_data_length(df: pd.DataFrame) -> pd.DataFrame:
     print(f"Number of occurences of each consensus class: {class_value_count}")
     min_class_count = min(class_value_count.values)
 
-    shortened = [df[df["c_label"] == class_val].sample(min_class_count) for class_val in classes]
+    shortened = [
+        df[df["c_label"] == class_val].sample(min_class_count) for class_val in classes
+    ]
     df_shortened = pd.concat(shortened, ignore_index=True)
     return df_shortened

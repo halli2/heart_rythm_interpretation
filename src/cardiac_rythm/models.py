@@ -91,7 +91,9 @@ class CNN(keras.Model):
         self.cnn_blocks = []
         settings = zip(config.filters, config.kernels, config.strides, config.pool)
         for filt, kernel, stride, pool in settings:
-            self.cnn_blocks.append(ConvBlock(filt, kernel, stride, config.padding, pool))
+            self.cnn_blocks.append(
+                ConvBlock(filt, kernel, stride, config.padding, pool)
+            )
         self.dropout = l.Dropout(config.dropout)
         # from Krasteva et al
         self.gmp = l.GlobalMaxPool1D()

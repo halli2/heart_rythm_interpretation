@@ -160,7 +160,7 @@ class RandomSearchCrossValidate(RandomSearch):
             model: CNN = self._try_build(hp)
 
             # Dump the model config in a better format (if it is valid)
-            if fold == 1:
+            if fold == 0:
                 logging.info(f"Training: {pp.pformat(model.config)}")
                 with open(f"{trial_dir}/model_config.json", "x") as f:
                     f.write(model.config.to_json(indent=2))  # type: ignore
@@ -237,7 +237,7 @@ class ProgressionLogger(keras.callbacks.Callback):
 def search_for_hyperparameters(args, rng: np.random.RandomState) -> None:
     df = load_data(args.file_path)
 
-    x = np.stack(df["s_ecg"].to_numpy())  # type: ignore
+    x = np.stack(df["s_ecg"].to_numpy())
     x = x.reshape((*x.shape, 1))
     y = df["c_label"].to_numpy()
     y = y - 1  # 0-4 instead of 1-5
