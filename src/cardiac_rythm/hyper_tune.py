@@ -141,7 +141,9 @@ class RandomSearchCrossValidate(RandomSearch):
         total_val_acc = 0.0
         total_loss = 0.0
         total_val_loss = 0.0
-        for fold, (train_index, val_index) in enumerate(self.skf.split(x_train, y_train)):
+        for fold, (train_index, val_index) in enumerate(
+            self.skf.split(x_train, y_train)
+        ):
             xt, xv = x_train[train_index], x_train[val_index]
             yt, yv = y_train[train_index], y_train[val_index]
             yt = pd.get_dummies(yt)
@@ -265,9 +267,15 @@ def search_for_hyperparameters(args, rng: np.random.RandomState) -> None:
         ProgressionLogger(),
     ]
 
+    hp = HyperParameters()
+    if args.override:
+        hp.Fixed("fc0", value=64)
+        hp.Fixed("fc1", value=32)
+        hp.Fixed("dropout", value=0.30000000000000004)
     tuner = RandomSearchCrossValidate(
         rng,
         n_folds=args.n_folds,
+        hyperparameters=hp,
         hypermodel=CNNTuner(
             args.n_filters,
             args.filters,
@@ -315,7 +323,9 @@ def search_for_hyperparameters(args, rng: np.random.RandomState) -> None:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
     parser = ArgumentParser(description="Search for hyperparameters.")
     parser.add_argument("file_path", help="Path to .mat file.")
     # Tuner settings
@@ -331,6 +341,10 @@ if __name__ == "__main__":
     parser.add_argument("--stride", type=int, default=1)
     parser.add_argument("--n_fc", type=int, default=2)
     parser.add_argument("--fc_choice", type=int, nargs="+", default=[32, 64, 128])
+
+    parser.add_argument(
+        "--override", help="Override FC and Dropout", action="store_true"
+    )
     args = parser.parse_args()
 
     # import tensorflow as tf
