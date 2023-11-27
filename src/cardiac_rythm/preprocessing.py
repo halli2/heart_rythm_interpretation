@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import scipy
 from numpy.typing import NDArray
+from sklearn import model_selection
 
 
 def load_data(data_file: str) -> pd.DataFrame:
@@ -15,6 +16,23 @@ def load_data(data_file: str) -> pd.DataFrame:
 
     df = pd.DataFrame(mat_cut_data)
     return df
+
+
+def load_train_test_data(data_file: str) -> tuple[NDArray, NDArray, NDArray, NDArray]:
+    df = load_data(data_file)
+    x = np.stack(df["s_ecg"].to_numpy())
+    x = x.reshape((*x.shape, 1))
+    y = df["c_label"].to_numpy()
+    y = y - 1  # 0-4 instead of 1-5
+
+    x_train, x_test, y_train, y_test = model_selection.train_test_split(
+        x,
+        y,
+        test_size=0.1,
+        random_state=0,
+        stratify=y,
+    )
+    return x_train, x_test, y_train, y_test
 
 
 def replicate_data(x, y):

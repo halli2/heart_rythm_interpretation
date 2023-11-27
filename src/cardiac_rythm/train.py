@@ -67,7 +67,8 @@ def fit(file_path: str, fit_settings: FitSettings, model_config: CNNConfig) -> N
         xt = x_train[train_index]
         yt = y_train[train_index]
 
-        xt, yt = preprocessing.replicate_data(xt, yt)
+        # TODO: Remove?
+        # xt, yt = preprocessing.replicate_data(xt, yt)
 
         yt = pd.get_dummies(yt)
         xv = x_train[val_index]

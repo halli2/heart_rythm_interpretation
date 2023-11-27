@@ -42,10 +42,3 @@ sbatch slurm_job_hyper.sh
 
 Where `slurm_man_fit.sh` contains an example of how to run a specific model and `slurm_job_hyper.sh`
 contains an example of how to run random search given some parameters.
-
-## Results
-
-Results are stored in the logs folder. Confusion matrix, and history plots are stored in logs/results/{timestamp}_{modelname}.
-To vizualise more data with tensorboard run `tensorboard --logdir logs/fit/{timestamp}_{modelname}` while in venv or poetry shell.
-
-

@@ -166,15 +166,28 @@ class RandomSearchCrossValidate(RandomSearch):
                 logging.info(f"Training: {pp.pformat(model.config)}")
                 with open(f"{trial_dir}/model_config.json", "x") as f:
                     f.write(model.config.to_json(indent=2))  # type: ignore
-            history = self.hypermodel.fit(
-                hp,
-                model,
-                xt,
-                yt,
-                validation_data=(xv, yv),
-                *remaining_args,  # noqa: B026
-                **copied_kwargs,
-            )
+            try:
+                history = self.hypermodel.fit(
+                    hp,
+                    model,
+                    xt,
+                    yt,
+                    validation_data=(xv, yv),
+                    *remaining_args,  # noqa: B026
+                    **copied_kwargs,
+                )
+            except ValueError as e:
+                logging.warning(f"Model: {model.config} had error calling 'fit'")
+                logging.warning(e)
+                histories.append(
+                    {
+                        "loss": 9999,
+                        "val_loss": 9999,
+                        "accuracy": 0,
+                        "val_accuracy": 0,
+                    }
+                )
+                return histories
 
             # Test the model and save conf mat, accuracy and loss
             # TODO: Or just do it on the BEST model?
@@ -202,6 +215,7 @@ class RandomSearchCrossValidate(RandomSearch):
                 "val_accuracy": avg_val_accuracy,
             }
         )
+        # TODO: Do this on every fold + save model for each?
         model.load_weights(saved_model)
         prediction = np.argmax(model.predict(x_test), axis=1)
         visualize_test_result(y_test, prediction, f"{trial_dir}/conf_mat.svg")
