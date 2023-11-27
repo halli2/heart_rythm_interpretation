@@ -11,6 +11,9 @@ Continuation of [https://github.com/SanderSondeland/ELE690_project1](https://git
 
 ## How to run
 
+To set up the project locally either pdm or pip/venv can be used.
+For usage on gorina a couple scripts are included.
+
 ### With pdm:
 
 This project used [pdm](https://github.com/pdm-project/pdm) as a package
