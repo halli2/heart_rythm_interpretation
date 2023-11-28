@@ -1,0 +1,7 @@
+{
+    "epochs": 250,
+    "batch_size": 32,
+    "folds": 10,
+    "normalize_data_length": false,
+    "cross_validate": true
+}
