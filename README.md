@@ -1,4 +1,4 @@
-# Emergency medical data analysis - heart-rythm-interpretation
+# Heart rhythm interpretation using a convolutional neural network
 
 Continuation of [https://github.com/SanderSondeland/ELE690_project1](https://github.com/SanderSondeland/ELE690_project1)
 
@@ -7,14 +7,18 @@ Continuation of [https://github.com/SanderSondeland/ELE690_project1](https://git
 * src/notebooks - contains notebooks for vizualisation of data.
 * src/cardiac_rythm - contains the code for the models.
 * results - contains the results for the hyper parameter search
-* logs - containing logs and results form the model fitting.
+* logs - containing logs and results from the model fitting.
+* report - contains the report from this project in pdf format, and latex code with figures.
+
+The "best" model is added under `logs/results/best_model`, which contains checkpoints for every fold done under
+cross validation and model settings in `model_config.json`.
 
 ## How to run
 
 To set up the project locally either pdm or pip/venv can be used.
 For usage on gorina a couple scripts are included.
 
-### With pdm:
+### Setup
 
 This project used [pdm](https://github.com/pdm-project/pdm) as a package
 manager, which can be used to set up the project with this command:
@@ -23,8 +27,7 @@ manager, which can be used to set up the project with this command:
 pdm install
 ```
 
-### Using pip and venv:
-
+If not using pdm it can just as easily be setup with pip/venv.
 These commands will setup a virtual environment and install all dependencies
 as configured in `pyproject.toml`.
 
@@ -34,7 +37,10 @@ source .venv/bin/activate
 pip install .
 ```
 
-Example of how to run a specific model:
+### Local running
+
+Example of how to run a specific model. We call the script with the path to dataset and
+arguments to tell how the model should be configured:
 
 ```sh
 python -u src/cardiac_rythm "/path/to/cutDataCinCTTI_rev_v2.mat" \
@@ -51,7 +57,8 @@ python -u src/cardiac_rythm "/path/to/cutDataCinCTTI_rev_v2.mat" \
 
 To get all available options run `python -u src/cardiac_rythm --help`.
 
-Example of how to run the hyper parameter random seach:
+Example of how to run the hyper parameter random seach, this can also be
+called with `--help` to get all available commands:
 
 ```sh
 python -u src/cardiac_rythm/hyper_tune.py "/path/to/cutDataCinCTTI_rev_v2.mat"  \
@@ -66,6 +73,12 @@ python -u src/cardiac_rythm/hyper_tune.py "/path/to/cutDataCinCTTI_rev_v2.mat"  
 --n_fc 2 \
 --fc_choice 16 32 64 128
 ```
+
+Explanation of whats happening.
+These commands will start the random search with 250 trials, 10-fold crossvalidation, 2 filters (2 convolutional blocks), number of filters in each block and kernels
+will choose randomly from the given values, dropout will be between 0.1 and 0.9.
+Pool size set to 2, stride set to 1 and 2 fully connected layers at the end choosing between the given
+sizes.
 
 ### On Gorina
 
@@ -86,3 +99,9 @@ Run:
 sbatch slurm_man_fit.sh
 sbatch slurm_job_hyper.sh
 ```
+
+## Notebooks
+
+Notebook `data_vizualisation.ipynb` contains vizualisations of the dataset and structures,
+`results_hyper.ipynb` contains vizualisations of the results from the random search, 
+and `results.ipynb` contains code to extract information from one model.
