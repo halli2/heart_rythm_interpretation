@@ -80,7 +80,7 @@ will choose randomly from the given values, dropout will be between 0.1 and 0.9.
 Pool size set to 2, stride set to 1 and 2 fully connected layers at the end choosing between the given
 sizes.
 
-### On Gorina
+### On Gorina (internal servers University of Stavanger)
 
 The file `tf_setup.sh` contains commands to set up the project on gorina.
 The files `slurm_man_fit.sh` and `slurm_job_hyper.sh` contains commands to 
