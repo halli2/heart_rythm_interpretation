@@ -319,24 +319,6 @@ def search_for_hyperparameters(args, rng: np.random.RandomState) -> None:
     )
 
 
-# def check_best(rng):
-#     n_filters = 2
-
-#     tuner = RandomSearchCrossValidate(
-#         rng,
-#         n_folds=2,  # TODO: 10 10 10
-#         hypermodel=CNNTuner(n_filters=n_filters),
-#         objective="val_loss",
-#         max_trials=2,
-#         directory="results",
-#         project_name=f"{n_filters=}",
-#         overwrite=False,  # TODO: FALSE FALSE FALSE! (don't want to lose data after many trials..)
-#     )
-#     # tuner.search_space_summary()
-#     print(tuner.get_best_models()[0].config)
-#     print(tuner.get_best_hyperparameters()[0].values)
-
-
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -362,10 +344,8 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    # import tensorflow as tf
 
     rng = np.random.RandomState(0)
     # tf.random.set_seed(0)
 
-    # check_best(rng)
     search_for_hyperparameters(args, rng)

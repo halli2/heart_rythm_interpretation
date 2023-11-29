@@ -59,7 +59,7 @@ class ConvBlock(l.Layer):
         self.conv = l.Conv1D(filters, kernel_size, stride, padding)
         self.bn = l.BatchNormalization()
         if pool:
-            self.pool = l.MaxPool1D(pool)  # , pool[1])
+            self.pool = l.MaxPool1D(pool)
         else:
             self.pool = None
         self.activation = l.ReLU()
@@ -95,7 +95,6 @@ class CNN(keras.Model):
                 ConvBlock(filt, kernel, stride, config.padding, pool)
             )
         self.dropout = l.Dropout(config.dropout)
-        # from Krasteva et al
         self.gmp = l.GlobalMaxPool1D()
         self.fc_blocks = []
         for fc in config.fc_end:
