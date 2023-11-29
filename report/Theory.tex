@@ -1,0 +1,24 @@
+\section{Background}
+
+This section  will explain how a convolutional neural network works in general, and what the different hyper parameters are. The hearth rhythms that are the five classes in the network will also be explained. 
+
+\subsection{Convolutional neural network (CNN)}\label{subsec:CNNtheory}
+%Convolutional Neural Networks (CNNs) are a class of feed-forward neural network that learns directly from data via filters (or kernel) optimization.
+Convolutional Neural Networks (CNNs) are a class of feed-forward neural network that tries to extract features directly from data via filters. CNNs are particularly useful for finding patterns in structured grid data, such as images, audio, time-series, and signal data. This can be used for tasks like image classification, object detection, image segmentation, and signal classification, as is the case for this project. What makes a neural network a \textit{convolutional} neural network is that at least one of the layers uses convolution instead of general matrix multiplication~\cite{deeplearning}.
+
+Convolution is a mathematical operation that combines two signals into a new third signal. The original signal is convolved with a filter, resulting in a new filtered signal. Typically for CNNs the kernels are much smaller than the input, which leads to sparse interactions between input and output units. This makes the model more effective and reduces the memory requirements~\cite{deeplearning}. The convolutional layers are the layers that extract meaningful features from the input data. 
+
+Another common layer in a CNN is the pooling layer. This is a downsampling layer which is used to reduce the spatial dimensions of the feature map after the convolutional layers. One common pooling method, and the one which is used in this project, is max pooling. In max pooling, the maximum value in each local region of the input feature map is found and used, while the rest of the values are discarded. Downsampling like this helps to decrease the computational load, while keeping essential information.
+
+
+\subsection{Heart rhythms} \label{subsec:heartrhythm}
+
+The heart rhythms in the dataset are divided into two main classes and five sub-classes. The main classes are shockable and non-shockable rhythm, which indicates whether a patient should or should not be shocked with a defibrillator. The sub-classes in the shockable class are ventricular fibrillation (VF) and ventricular tachycardia (VT). For the non-shockable class the sub-classes are asystole (AS), pulseless electrical activity (PEA) and pulse generating rhythm (PGR). A description of the sub-classes is listed below.
+
+\begin{itemize}
+    \item VF: Ventricular fibrillation is an arrhythmia that affects the ventricles in the heart~\cite{vfib}. It means that the heart muscle quivers or twitches (fibrillates) instead of completely expanding and squeezing. This leads to the heart not pumping out blood as it should.
+    \item VT: Ventricular tachycardia is another type of arrhythmia, marked by an uncharacteristically fast heartbeat~\cite{vtach}. Instead of beating 60-100 times per minute (as is normal), a heart that is in VT beats over a 100 times or more per minute. VT is caused by irregular electrical impulses in the ventricles, and can cause a sudden cardiac arrest or lead to the organs not getting enough oxygen.
+    \item AS: Asystole is when the heart stops pumping entirely and there are no electrical signals, making it a type of cardiac arrest~\cite{asystole}. It is also often called "flat-line" or "flat lining", since it looks like a flat line on an electrocardiogram. The heart has no detectable electrical activity.
+    \item PEA: Pulseless electrical activity is when the electrical activity in the heart is too weak to make it pump~\cite{PEA}. This means there are electrical signals there, but they do not make the heart contract. If it is not treated immediately the heart will go into asystole. The difference from AS is that with PEA there is still \textit{some} electrical activity, although not enough to make the heart pump.
+    \item PGR: Pulse generating rhythm is simply a heart rhythm that generates a pulse. This includes normal sinus rhythm, but is not limited to it~\cite{PR}.
+\end{itemize}

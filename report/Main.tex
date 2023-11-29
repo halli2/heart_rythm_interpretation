@@ -1,0 +1,135 @@
+\documentclass[11pt]{report}
+\usepackage[english]{babel}
+\usepackage{pgfplots}
+\usepackage{layouts}
+\usepackage{tabularx}
+\usepackage{caption}
+\usepackage{makecell} % To allow line breaks in cells
+\renewcommand\theadfont{\bfseries} % Bold column headers
+\renewcommand\theadalign{lc}
+\usepackage[labelfont=bf]{caption} %figure captions in bold
+\usepackage[T1]{fontenc} % Gjør at man får printet ut æ,ø,å
+\usepackage{amsmath} % Gir muligheten for matematiske uttrykk
+\usepackage{amsfonts} % Mattefont og ekstra symboler 
+\usepackage{mathtools} % matteverktøy 
+\usepackage[thinc]{esdiff} % gir muligheten til å enkelt lage d/dx derivasjoner 
+\usepackage[sort, square,numbers]{natbib} %Referanser
+\bibliographystyle{abbrvnat} % Innstillinger Referanser 
+\usepackage{graphicx} % Gir muligheten for bilder
+\usepackage{float} % Gir muligheten for at figurer o.l. plasseres der de passer best, rent størrelsesmessig (bruk [H] for å "låse" bildet på det punktet i teksten hvor du skrev det inn)
+\usepackage{color} % Gir muligheten for å ha farge på teksten
+\usepackage{enumerate} % Gir mulighet for romertall i lister 
+\usepackage{lscape} % Gir muligheten  for liggende sider
+\usepackage{subfiles} % Gjør at man kan jobbe i en hovedfil, og hente fra underfiler som ligger i mapper i samme path som hovedfilen.
+\usepackage{subcaption} % Gir muligheten for å ha to figurer som relaterer til hverandre, men at det blir én oppføring på figurlista (f.eks 1a og 1b, men det blir i "hovedfigur" 1)
+\usepackage{pdfpages} % For å implementere pdf. \includepdf[pages=-]{myfile.pdf}
+\usepackage{threeparttable} % Brukt for å kunne gi fotnoter i tabellen
+\parindent0mm  % ingen innrykk ved begynnelsen av avsnitt
+\setlength{\parskip}{0.5cm}  % denne lager 5mm avstand ved avsnitt
+%\renewcommand{\rmdefault}{cmss} %font
+\usepackage{lipsum} % Dummytekst 
+\usepackage{hyperref} % Hyperlinker 
+\usepackage{svg}
+\usepackage{pgffor}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    citecolor = black,
+    pdftitle={Automatic Number Plate Recognition},
+    pdfpagemode=UseOutlines,
+    }
+\usepackage[margin=1.15in,headheight=14pt]{geometry}
+\usepackage{colortbl}
+\usepackage{xcolor}
+%\usepackage[table,xcdraw]{xcolor}
+
+\definecolor{darkgreen}{rgb}{0.0, 0.6, 0.0}
+\definecolor{darkred}{rgb}{0.6, 0.0, 0.0}
+\definecolor{gray}{rgb}{0.6, 0.6, 0.6}
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+
+%\renewcommand{\includegraphics}[2][]{}
+
+\usepackage[normalem]{ulem} %to strike the words
+\usepackage{tikz}
+\pgfplotsset{compat=1.16}
+
+\setcounter{secnumdepth}{4} % Allow numbering up to four levels
+
+\newcommand{\subsubsubsection}[1]{\paragraph{#1}\mbox{}\\}
+
+\usepackage{titletoc}
+\usepackage{tocloft}
+
+% Increase the space between entries
+\setlength{\cftbeforechapskip}{12pt} % Adjust this value as needed
+\setlength{\cftbeforesecskip}{10pt} % Adjust this value as needed
+
+% Increase the space between the number and the title
+\cftsetpnumwidth{2em} % Adjust the value for the page number width
+\cftsetpnumwidth{2.5em} % Adjust the value for the section number width
+
+% Increase the space between lines
+\setlength{\cftbeforechapskip}{2ex} % Adjust this value as needed
+\usepackage{titlesec}
+
+% Reduce the spacing below section headers
+\titlespacing{\section}{0pt}{\parskip}{0.2\parskip} % Adjust the 0.5\parskip as needed
+\titlespacing{\subsection}{0pt}{\parskip}{0.2\parskip} % Adjust the 0.5\parskip as needed
+
+\titlespacing{\subsubsection}{0pt}{\parskip}{0.2\parskip} 
+
+\usepackage{appendix}
+
+\usepackage{minted}
+\usemintedstyle{friendly}
+% Define a new color for the lighter gray background
+\definecolor{lightergray}{RGB}{240, 240, 240}
+
+% Define a new color for the lighter gray border
+\definecolor{lighterbordergray}{RGB}{150, 150, 150}
+% Define a new environment with the custom background and border colors
+\newminted{python}{
+    bgcolor=lightergray,
+    linenos=false,
+    frame=lines,
+    framesep=2mm,
+    framerule=0.8pt,
+    rulecolor=lighterbordergray
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+\renewcommand{\thesection}{\arabic{section}}
+\pagenumbering{gobble}
+\input{Titlepage}
+\newpage
+\thispagestyle{empty}
+\input{Abstract}
+\newpage
+\tableofcontents
+\newpage
+\pagenumbering{arabic}
+
+%\input{Abstract}
+\input{Introduction}
+\input{Theory}
+\input{Materials and methods}
+\input{Results}
+\input{Discussion}
+
+
+%\newpage
+%Referanser
+
+\renewcommand{\bibname}{References}
+\bibliography{references.bib}
+%\nocite{*}
+
+\end{document}   
+

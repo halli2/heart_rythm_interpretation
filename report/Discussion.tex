@@ -1,0 +1,18 @@
+\section{Discussion}
+
+In general this type of network seems to work well for classifying heart rhythms, with many of the models reaching over $90\%$ BAC. This section will discuss the outcome of the project and some areas where there is potential for improvement.
+
+
+%
+To achieve more robust and better results, a larger dataset could be desirable. There does not exist a specific rule that says how big a dataset should be for a CNN, but most sources agree that it should be as big as possible. Also, as mentioned in section~\ref{sec:matandmet}, the balance of the dataset could be better. Especially the VT samples are very few, and this leads to the model having a harder time classifying this class correctly. 
+
+With the current model architecture it was not possible to have more than five convolution blocks. This is because most trials would fail with more convolution blocks due to the down-sampling. A possible improvement is to have smaller kernels in the later layers, and/or use padding with the max pooling layers. This would make it possible to have more convolution blocks.
+
+Future work could also experiment more with the fully connected layers. This was not experimented much with, and as~\cite{fullyconnected} says, bigger fully connected layers probably would improve the model. There could also be made a few improvements to how the parameters are tested. Often the size of both filter and kernels gets smaller for each layer, while in this model the size was chosen randomly. 
+
+\subsection{Conclusion}
+
+This project has developed a CNN model for classifying heart rhythms. It has been tested, first with five non-fixed parameters and then with three. The best model was achieved with four convolutional blocks, which gave a balanced accuracy of $0.91$. The biggest improvements to the model from the previous project~\cite{cardiac}, is the added global max pooling after the convolutional blocks, and bigger kernel sizes in the convolutional layer. This resulted in a more robust model with less overfitting and better test results. 
+
+The same dataset is used in the articles "A Convolutional Neural Network Approach for Interpreting Cardiac Rhythms from Resuscitation of Cardiac Arrest Patients"~\cite{eftes} and "Multimodal Biosignal Analysis Algorithm for the  Classification of Cardiac Rhythms During Resuscitation"~\cite{lasa}. Compared to the results from these articles, this project has achieved improvements in Acc, Sen and PPV. This can especially be seen in the Sen and PPV of the VT class. Where in the first article Sen = 0.60 and PPV = 0.481, the second Sen = 0.773 and PPV = 0.661, and in this project Sen = 0.82 and PPV = 0.74. This shows that the project have made progress in the study of classifying heart rhythms.  
+ 

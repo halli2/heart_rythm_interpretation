@@ -1,0 +1,15 @@
+\section{Introduction}
+% Må ha med:
+% Generell introduksjon
+% OHCA, hva det er hvorfor det er nyttig å kunne gjenkjenne ulike hjerterytmer
+% Hva andre har gjort(fjorårets prosjekt osv)
+
+Cardiac arrest is when the heart suddenly stops pumping, and this is one of the most common causes of death worldwide~\cite{ca_worldwide}. Out-of-Hospital cardiac arrest (OHCA) also happens to around 3000 people in Norway every year, and when this happens it would be useful with a machine that can tell you what is going on with the heartbeat and when to shock the person in cardiac arrest~\cite{ca_norge}. 
+
+Between 2002 and 2004 there was conducted a study to measure the quality of CPR in three different cities, Akershus, Stockholm and London~\cite{original_study}. The study is called "Quality of Cardiopulmonary Resuscitation During Out-of-Hospital Cardiac Arrest", and this study collected ECG-data that was annotated by experts. 
+
+In 2022 the same dataset was used for a project at UiS~\cite{cardiac}. The project built a neural network to classify the dataset into five classes, with the goal "to create a model that provides the best accuracy". The classes are explained in subsection~\ref{subsec:heartrhythm}. This years project builds on the code from last year, with additional features that were inspired by the article "Fully Convolutional Deep Neural Networks with Optimized Hyperparameters for Detection of Shockable and Non-Shockable Rhythms"~\cite{2020}. The goal was to improve the network to get a better accuracy through more extensive testing and experimenting on the different hyper parameters. 
+
+
+
+%In 2022 the same dataset was used for a project here at UiS~\cite{cardiac}. They built a neural network to classify the dataset into two classes, "shockable" and "non-shockable rhytm", with the goal "to create a model that provides the best accuracy". This years project builds on that code, with additional feautures that were inspired by the article "Fully Convolutional Deep Neural Networks with Optimized Hyperparameters for Detection of Shockable and Non-Shockable Rhythms"~\cite{2020}. This year, the goal was to classify the dataset into five classes, one for each type of hearth rhythm, and for this there was made a convolutional neural network.

@@ -1,0 +1,345 @@
+\section{Results}
+
+The results section is divided in three parts. First the results of the random search without fixed parameters are presented, and then the results with two more of the parameters fixed are presented. At the end of each of these two subsections there is a table that shows the parameters for the most optimal models, and then confusion matrices to summarize the performance of the model.  At last the results from the model giving the highest BAC from the trials is presented, where the results from another 10-fold cross validation training is presented to look at robustness and variation within the model.
+
+\newpage
+\subsection{Without fixed parameters}
+
+
+The scatter plot in figure~\ref{fig:scatter} shows the relation between the accuracy and the number of trainable parameters in the model. The plot to the left uses the accuracy and the plot on the right uses the balanced accuracy. For the rest of the report the results are presented with regards to the BAC.  
+
+From the scatter plot it can be seen that the model does not necessarily improve with added complexity. The BAC does not improve noticeably with more trainable parameters. Since there are five classes, a $BAC=20\%(=\frac{100}{5})$ equals the probability of correctly classifying by random guessing. For $N=5$ there are some number of trainable parameters that makes the BAC go to $20\%$. Why this happens is explained more in the next paragraph. It is not possible to deduce which N works best from this scatter plot, but it is clear that $N=2$ achieves poorer results than the rest.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[b]{0.48\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/unfixed/scatter_acc.svg}
+        \vspace{-0.5cm}
+    \end{minipage}
+    \begin{minipage}[b]{0.48\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/unfixed/scatter_bac.svg}
+        \vspace{-0.5cm}
+    \end{minipage}
+    \captionsetup{width=0.95\linewidth}
+    \caption{Scatter plots showing the relationship between number of tuneable parameters and the accuracy (on the left) or the balanced accuracy (on the right), for each N. }
+    \label{fig:scatter}
+\end{figure}
+
+Figure~\ref{fig:dropout_acc} shows the BAC in relation to the dropout for N equal to two, three, four and five. The common factor in all four plots is that a too high dropout value results in a low accuracy. This is what causes the previously mentioned $20\%$ BAC in the scatterplot. For $N=5$ in figure~\ref{fig:dropout_acc} a dropout between $0.7$ and $0.9$ gives this accuracy of $20\%$. When the dropout value gets too high, too many neurons are set to zero, and the model will not have enough information. For all four N the best accuracy is achieved when the dropout median is $0.3$. 
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/2_dropout.svg}
+        \vspace{-0.5cm}
+        \caption*{a)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/3_dropout.svg}
+        \vspace{-0.5cm}
+        \caption*{b)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/4_dropout.svg}
+        \vspace{-0.5cm}
+        \caption*{c)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/5_dropout.svg}
+        \vspace{-0.5cm}
+        \caption*{d)}
+    \end{minipage}
+    \captionsetup{width=0.95\linewidth}
+    \caption{The relationship between dropout and BAC. For a) $N=2$, b) $N=3$, c) $N=4$ and d) $N=5$.}
+    \label{fig:dropout_acc}
+\end{figure}
+
+
+The third parameter that was experimented with was the kernel sizes, $K_i$. Figure~\ref{fig:k_acc} shows the relation between kernel size and the accuracy, with one block for each $K_i$. For $N=2$ there seems to be a positive correlation between the two, so that a bigger kernel size yields a better accuracy. For $N>2$ the relation is not as obvious. The kernel size's effect are tested further in the next subsection.
+
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.42\textwidth}
+        \includesvg[width=\textwidth]{Img/results/2_ksize.svg}
+        \hspace{-0.5cm}
+        \caption*{a)}
+    \end{minipage}
+    \begin{minipage}{0.42\textwidth}
+        \includesvg[width=\textwidth]{Img/results/3_ksize.svg}
+        \hspace{-0.5cm}
+        \caption*{b)}
+    \end{minipage}
+    \begin{minipage}{0.42\textwidth}
+        \includesvg[width=\textwidth]{Img/results/4_ksize.svg}
+        \hspace{-0.5cm}
+        \caption*{c)}
+    \end{minipage}
+    \begin{minipage}{0.42\textwidth}
+        \includesvg[width=\textwidth]{Img/results/5_ksize.svg}
+        \hspace{-0.5cm}
+        \caption*{d)}
+    \end{minipage}
+    \captionsetup{width=0.95\linewidth}
+    \caption{The relationship between kernel size and BAC. For a) $N=2$, b) $N=3$, c) $N=4$ and d) $N=5$.}
+    \label{fig:k_acc}
+\end{figure}
+
+For the number of filters, $F_i$, the relation with the accuracy is shown in figure~\ref{fig:f_acc}. How these two relates to each other is not very obvious from the plots. This parameter was also tested further in the next subsection.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/2_filters.svg}
+        \vspace{-0.5cm}
+        \caption*{a)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/3_filters.svg}
+        \vspace{-0.5cm}
+        \caption*{b)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/4_filters.svg}
+        \vspace{-0.5cm}
+        \caption*{c)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/5_filters.svg}
+        \vspace{-0.5cm}
+        \caption*{d)}
+    \end{minipage}
+    \captionsetup{width=0.95\linewidth}
+    \caption{The relationship between number of filters and BAC. For a) $N=2$, b) $N=3$, c) $N=4$ and d) $N=5$.}
+    \label{fig:f_acc}
+\end{figure}
+
+Before the output layers there are two fully connected layers, and the size of these were the last parameter that was experimented with. Figure~\ref{fig:fc_acc} shows the relationship between this size and the accuracy. From this it is possible to take the values with the best accuracy for each N, and this is summarized below. 
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/2_fc.svg}
+        \vspace{-0.5cm}
+        \caption*{a)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/3_fc.svg}
+        \vspace{-0.5cm}
+        \caption*{b)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/4_fc.svg}
+        \vspace{-0.5cm}
+        \caption*{c)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/5_fc.svg}
+        \vspace{-0.5cm}
+        \caption*{d)}
+    \end{minipage}
+    \captionsetup{width=0.95\linewidth}
+    \caption{The relationship between number of nodes in the fully connected hidden layers and BAC. For a) $N=2$, b) $N=3$, c) $N=4$ and d) $N=5$.}
+    \label{fig:fc_acc}
+\end{figure}
+
+Table~\ref{tab:opt_parameters} shows the parameters for the model that performed best for each N. To assess which model is best, the balanced accuracy was calculated for each model. The BAC is listed on the far right of the table.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+        \hline
+        \textbf{N} & \textbf{K1} & \textbf{K2} & \textbf{K3} & \textbf{K4} & \textbf{K5} & \textbf{F1} & \textbf{F2} & \textbf{F3} & \textbf{F4} & \textbf{F5} & \textbf{FC1} & \textbf{FC2} & \textbf{Dropout} & \textbf{Max BAC} \\ \hline
+        \textbf{2} & 20 & 50 & - & - & - & 30 & 50 & - & - & - & 64 & 64 & 0.6 & 0.949 \\
+        \textbf{3} & 10 & 25 & 50 & - & - & 50 & 20 & 15 & - & - & 128 & 32 & 0.6 & 0.946 \\
+        \textbf{4} & 30 & 20 & 50 & 20 & - & 5 & 25 & 40 & 50 & - & 128 & 16 & 0.2 & 0.946 \\
+        \textbf{5} & 40 & 40 & 10 & 5 & 20 & 5 & 25 & 40 & 40 & 50 & 64 & 32 & 0.3 & 0.956 \\
+        \hline
+    \end{tabular}
+    \captionsetup{width=0.95\linewidth}
+    \caption{Parameters for the most optimal models found under the small random search.}
+    \label{tab:opt_parameters}
+\end{table}
+
+
+In figure~\ref{fig:confus} the confusion matrices of the four models in the table are shown. All four models have quite good results, both in terms of the balanced accuracy and the confusion matrices. The model with five convolutional layers has the best results, with $BAC=0.956$ and values on the diagonal of the confusion matrix very close to one.
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=0.8\linewidth]{Img/results/unfixed/conf.svg}
+    \captionsetup{width=0.95\linewidth}
+    \caption{Confusion matrices of the best model for each N.}
+    \label{fig:confus}
+\end{figure}
+
+
+\subsection{With fixed parameters}
+
+In this section the dropout and number of nodes in the fully connected layers were fixed, to $Dropout=0.3$, $FC_1=64$ and $FC_2=32$. These experiments where done to try to get a better overview of the effect that kernel size and filters have on the model.
+
+Figure \ref{fig:scatter_fixed} shows the relation between the number of tuneable parameters and the accuracy, for each N. The plot on the left uses accuracy and the plot on the right uses balanced accuracy. It is clear that these results are better than the results without fixed parameters, because none of the models get the BAC of $20\%$. Apart from that one can still observe that more trainable parameters does not necessarily increase the accuracy.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[b]{0.49\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/fixed/scatter_fixed_acc.svg}
+        \vspace{-0.5cm}
+    \end{minipage}
+    \begin{minipage}[b]{0.49\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/fixed/scatter_fixed_bac.svg}
+        \vspace{-0.5cm}
+    \end{minipage}
+    \captionsetup{width=0.95\linewidth}
+    \caption{Scatter plots showing the relationship between number of trainable parameters and the accuracy (on the left) or the balanced accuracy (on the right), for each N, with fixed parameters.}
+    \label{fig:scatter_fixed}
+\end{figure}
+
+In figure~\ref{fig:kernel_acc} the relation between the kernel size and the BAC is shown. It is still hard to see any real correlation between kernel sizes and results for the bigger N's, but for $N=2$ and $N=3$ the accuracy gets better for bigger kernel sizes.
+
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/fixed/fixed_2_ksize.svg}
+        \vspace{-0.5cm}
+        \caption*{a)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/fixed/fixed_3_ksize.svg}
+        \vspace{-0.5cm}
+        \caption*{b)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/fixed/fixed_4_ksize.svg}
+        \vspace{-0.5cm}
+        \caption*{c)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/fixed/fixed_5_ksize.svg}
+        \vspace{-0.5cm}
+        \caption*{d)}
+    \end{minipage}
+    \captionsetup{width=0.95\linewidth}
+    \caption{The relationship between kernel size and BAC with fixed parameters. For a) $N=2$, b) $N=3$, c) $N=4$ and d) $N=5$.}
+    \label{fig:kernel_acc}
+\end{figure}
+
+The relation between the number of filters and the BAC are plotted in figure~\ref{fig:filter_acc}. This plot does not show any obvious relation between the number of filters and the BAC, so the best number of filters was determined from which model got the best BAC for each N.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/fixed/fixed_2_filters.svg}
+        \vspace{-0.5cm}
+        \caption*{a)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/fixed/fixed_3_filters.svg}
+        \vspace{-0.5cm}
+        \caption*{b)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/fixed/fixed_4_filters.svg}
+        \vspace{-0.5cm}
+        \caption*{c)}
+    \end{minipage}
+    \begin{minipage}[b]{0.42\textwidth}
+        \includesvg[width=1\textwidth]{Img/results/fixed/fixed_5_filters.svg}
+        \vspace{-0.5cm}
+        \caption*{d)}
+    \end{minipage}
+    \captionsetup{width=0.95\linewidth}
+    \caption{The relationship between number of filters and BAC with fixed parameters. For a) $N=2$, b) $N=3$, c) $N=4$ and d) $N=5$.}
+    \label{fig:filter_acc}
+\end{figure}
+
+The best models, for each N, found from testing with fixed Dropout and $FC_j$ are listed in table~\ref{tab:opt_parameters2}. The model with the best BAC is highlighted in green, and this is the one that is used in the next subsection. It got a BAC of $0.958$.
+
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+        \hline
+        \textbf{N} & \textbf{K1} & \textbf{K2} & \textbf{K3} & \textbf{K4} & \textbf{K5} & \textbf{F1} & \textbf{F2} & \textbf{F3} & \textbf{F4} & \textbf{F5} & \textbf{Max BAC} \\
+        \hline
+        \textbf{2} & 40 & 20 & - & - & - & 40 & 20 & - & - & - & 0.942   \\
+        \textbf{3} & 25 & 20 & 25 & - & - & 20 & 15 & 30 & - & - & 0.946   \\
+        \rowcolor{green}\textbf{4} & 40 & 30 & 10 & 40 & - & 30 & 10 & 25 & 40 & - & 0.958   \\
+        \textbf{5} & 40 & 5 & 25 & 25 & 20 & 40 & 15  & 30 & 5 & 10 & 0.946   \\
+        \hline
+    \end{tabular}
+    \caption{Parameters for the optimal models found under random search with fixed parameters: $Dropout=0.3$, and dense layers $FC_1=64$ and $FC_2=32$. With two to five convolution blocks in the models. The green highlights the model with the best BAC.}
+    \label{tab:opt_parameters2}
+\end{table}
+
+Confusion matrices of the best models for each N are shown in figure~\ref{fig:confus_fix}. This supports the table~\ref{tab:opt_parameters2} in that the model with $N=4$ is the best, as the values on the diagonal are so close to one.
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=0.8\linewidth]{Img/results/fixed/conf_fixed.svg}
+    \captionsetup{width=0.85\linewidth}
+    \caption{Confusion matrices of the best model for each N, with dropout fixed to 0.3, and the fully connected layers fixed at $FC_1 = 64, FC_2 = 32$.}
+    \label{fig:confus_fix}
+\end{figure}
+
+
+\subsection{Best model}
+
+To evaluate the best model as found with the fixed random search (green in table~\ref{tab:opt_parameters2}), the model was tested again to see how it performs over 10-fold cross validation.
+
+Figure \ref{fig:best_history} shows all ten training histories when retraining with the best model. From the validation accuracy and the validation loss it is a noticeable difference between each run. 
+
+\begin{figure}[H]
+    \centering
+    \includesvg[width=0.7\linewidth]{Img/results/best_model/best_training.svg}
+    \captionsetup{width=0.95\linewidth}
+    \caption{Training histories for all ten runs with the best model.}
+    \label{fig:best_history}
+\end{figure}
+
+Table~\ref{tab:rp} shows the accuracy, BAC, sensitivity (Sen) and positive predictive value (PPV) for the best model, with median and 25th/75th percentile. The sensitivity is the number of true positives divided by the summation of true positives and false negatives, i.e. it shows if the model can find all objects in the class. The PPV is the number of true positives divided by the summation of true positives and false positives, i.e. it shows how often the model is correct when it predicts this class. The values for ventricular tachycardia (VT) are quite low for both the sensitivity and PPV. This could be because it has a very low number of samples in the training set. The BAC reaches a value of $0.91$, which is a bit lower than in the previous subsection. This can indicate that the model has a lot of variance due to randomness in data selection and weight initialization in the model.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+    \hline
+         & Acc & BAC & \multicolumn{2}{c|}{AS} & \multicolumn{2}{c|}{PEA} & \multicolumn{2}{c|}{PGR} & \multicolumn{2}{c|}{VF} & \multicolumn{2}{c|}{VT}  \\ \hline
+         & & & Sen & PPV & Sen & PPV & Sen & PPV & Sen & PPV & Sen & PPV \\ \hline
+         Median & 0.92 & 0.91 & 1.00 & 0.95 & 0.91 & 0.93 & 0.87 & 0.92 & 0.98 & 0.95 & 0.82 & 0.74 \\ \hline
+         25th percentile & 0.91 & 0.91 & 0.98 & 0.95 & 0.90 & 0.92 & 0.86 & 0.92 & 0.97 & 0.93 & 0.78 & 0.69 \\ \hline
+         75th percentile & 0.93 & 0.92 & 1.00 & 0.95 & 0.92 & 0.94 & 0.88 & 0.94 & 0.98 & 0.96 & 0.82 & 0.76 \\ \hline
+    \end{tabular}
+    \caption{Table containing the median and the 25th/75th percentile of accuracy, BAC, sensitivity (Sen) and positive predictive value (PPV) of every class when retesting the "best model".}
+    \label{tab:rp}
+\end{table}
+
+
+% \begin{table}[H]
+%     \centering
+%     \begin{tabular}{|c|c|}
+%         \hline
+%             & Median (25th percentile, 75th percentile) \\
+%         \hline
+%         Acc & 0.92 (0.91, 0.93) \\
+%         BAC & 0.91 (0.91, 0.92) \\
+%         \hline
+%         AS (Sen) & 1.00 (0.98, 1.00) \\
+%         AS (P) & 0.95 (0.95, 0.95) \\
+%         \hline
+%         PEA (Sen) &  0.91 (0.90, 0.92) \\
+%         PEA (P) &  0.93 (0.92, 0.94) \\
+%         \hline
+%         PGR (Sen) & 0.87 (0.86, 0.88) \\
+%         PGR (P) & 0.92 (0.92, 0.94) \\
+%         \hline
+%         VF (Sen) & 0.98 (0.97, 0.98) \\
+%         VF (P) & 0.95 (0.93, 0.96) \\
+%         \hline
+%         VT (Sen) & 0.82 (0.78, 0.82) \\
+%         VT (P) & 0.74 (0.69, 0.76) \\
+%         \hline
+%     \end{tabular}
+%     \caption{Table containing the median and the 25th/75th percentile of accuracy, BAC, sensitivity (Sen) and precision (P) of every class when retesting the "best model".}
+%     \label{tab:rp}
+% \end{table}
+
